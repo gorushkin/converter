@@ -7,17 +7,23 @@ import prettier from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
 import unusedImports from 'eslint-plugin-unused-imports';
 import perfectionist from 'eslint-plugin-perfectionist';
+import importOrder from 'eslint-plugin-import';
 
 export default tseslint.config(
   { ignores: ['dist', 'node_modules'] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommendedTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
+    ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: { ...globals.browser, ...globals.es2022 },
       parserOptions: {
-        project: ['tsconfig.app.json', 'tsconfig.node.json'],
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: {
@@ -25,9 +31,10 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
       'unused-imports': unusedImports,
       'eslint-plugin-prettier': prettier,
-      'eslint-plugin-react': react,
+      react,
       perfectionist: perfectionist,
       'typescript-eslint': tseslint,
+      'import': importOrder,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -37,6 +44,33 @@ export default tseslint.config(
       'no-multiple-empty-lines': 'error',
       'react-hooks/exhaustive-deps': 'error',
       'perfectionist/sort-objects': 'warn',
+      'max-len': [
+        'warn',
+        {
+          code: 120,
+        },
+      ],
+      'import/order': [
+        'warn',
+        {
+          'newlines-between': 'always',
+          pathGroupsExcludedImportTypes: ['react'],
+          pathGroups: [
+            {
+              pattern: '{react,react-dom/**}',
+              group: 'external',
+              position: 'before',
+            },
+          ],
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+        },
+      ],
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
     },
   }
 );
