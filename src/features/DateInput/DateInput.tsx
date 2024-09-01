@@ -1,7 +1,7 @@
-import { getRate } from '@/api';
-import { Input } from '@/shared/Input/Input';
-import { updateRow } from '@/store';
-import { Row } from '@/store/types';
+import { getRate } from 'src/api';
+import { Input } from 'src/shared/Input/Input';
+import { updateRow } from 'src/store';
+import { Row } from 'src/store/types';
 
 type DateInputProps = {
   values: Row;

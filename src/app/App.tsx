@@ -1,9 +1,8 @@
 import { Row } from 'antd';
+import { Body } from 'src/widgets/Body';
+import { Header } from 'src/widgets/Header/Header';
 
 import styles from './App.module.css';
-
-import { Body } from '@/widgets/Body';
-import { Header } from '@/widgets/Header/Header';
 
 export const App = () => {
   return (

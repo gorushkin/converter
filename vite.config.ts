@@ -8,8 +8,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      '@': resolve(__dirname, 'src/'),
+      src: resolve(__dirname, 'src/'),
     },
   },
 });

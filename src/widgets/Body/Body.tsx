@@ -5,9 +5,9 @@ import { ColumnsType } from 'antd/es/table';
 
 import styles from './Body.module.scss';
 
-import { AmountInput } from '@/features/AmountInput';
-import { DateInput } from '@/features/DateInput';
-import { store, saveRow } from '@/store';
+import { AmountInput } from 'src/features/AmountInput';
+import { DateInput } from 'src/features/DateInput';
+import { store, saveRow } from 'src/store';
 
 type Row = {
   date: string;

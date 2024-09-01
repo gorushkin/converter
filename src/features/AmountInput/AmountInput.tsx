@@ -1,6 +1,6 @@
-import { Input } from '@/shared/Input';
-import { updateRow } from '@/store';
-import { Row } from '@/store/types';
+import { Input } from 'src/shared/Input';
+import { updateRow } from 'src/store';
+import { Row } from 'src/store/types';
 
 type AmountInputProps = {
   values: Row;

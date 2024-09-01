@@ -1,10 +1,8 @@
+import { counter } from 'src/utils';
 import { create, StoreApi, UseBoundStore } from 'zustand';
 
 import { Row } from './types';
 
-import { counter } from '@/utils';
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 const getId = counter() as () => string;
 
 type State = {
