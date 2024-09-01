@@ -30,18 +30,18 @@ export default tseslint.config(
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       'unused-imports': unusedImports,
-      'eslint-plugin-prettier': prettier,
+      prettier,
       react,
       perfectionist: perfectionist,
       'typescript-eslint': tseslint,
-      'import': importOrder,
+      import: importOrder,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'unused-imports/no-unused-imports': 'error',
       'no-console': 'error',
-      'no-multiple-empty-lines': 'error',
+      'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
       'react-hooks/exhaustive-deps': 'error',
       'perfectionist/sort-objects': 'warn',
       'max-len': [
@@ -67,6 +67,38 @@ export default tseslint.config(
             caseInsensitive: true,
           },
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+        },
+      ],
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              // Запрещаем все относительные импорты
+              regex: '^\\.{2}/.*',
+              message:
+                'Запрещены относительные импорты. Разрешены только импорты `types.ts` и `*.module.scss` из той же папки.',
+            },
+          ],
+        },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'prettier/prettier': [
+        'error',
+        {
+          bracketSpacing: true,
         },
       ],
       ...react.configs.recommended.rules,
