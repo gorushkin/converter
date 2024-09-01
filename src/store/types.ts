@@ -6,3 +6,5 @@ export type Row = {
   mode: 'edit' | 'view';
   id?: string;
 };
+
+export type InputType = 'date' | 'amount';

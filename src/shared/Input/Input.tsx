@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Input as AntInput, InputRef } from 'antd';
+import { setActiveInput, store } from 'src/store/store';
+import { InputType } from 'src/store/types';
 
 type InputProps = {
   onChange: (value: string) => void;
   value?: string;
+  name: InputType;
 };
 
 enum Button {
@@ -16,11 +19,12 @@ enum Button {
 }
 
 const isLeftPressed = (key: Button) => key === Button.ArrowLeft;
-
 const isRightPressed = (key: Button) => key === Button.ArrowRight;
 
-export const Input = ({ onChange, value }: InputProps) => {
+export const Input = ({ name, onChange, value }: InputProps) => {
   const inputRef = useRef<InputRef | null>(null);
+
+  const activeInput = store.use.activeInput();
 
   const [state, setState] = useState<'left' | 'middle' | 'right'>('left');
 
@@ -45,6 +49,12 @@ export const Input = ({ onChange, value }: InputProps) => {
     };
   }, [state]);
 
+  useEffect(() => {
+    if (activeInput === name) {
+      inputRef.current?.focus();
+    }
+  }, [activeInput, name]);
+
   return (
     <AntInput
       onSelect={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +68,11 @@ export const Input = ({ onChange, value }: InputProps) => {
       }}
       ref={inputRef}
       onChange={handleChange}
+      name={name}
       value={value}
+      onFocus={() => {
+        setActiveInput(name);
+      }}
     />
   );
 };

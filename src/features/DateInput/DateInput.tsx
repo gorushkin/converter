@@ -14,5 +14,5 @@ export const DateInput = ({ values }: DateInputProps) => {
     updateRow('rate', rate.toString());
   };
 
-  return <Input onChange={handleChange} value={values.date} />;
+  return <Input name="date" onChange={handleChange} value={values.date} />;
 };

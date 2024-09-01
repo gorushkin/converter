@@ -1,16 +1,18 @@
 import { counter } from 'src/utils';
 import { create, StoreApi, UseBoundStore } from 'zustand';
 
-import { Row } from './types';
+import { Row, InputType } from './types';
 
 const getId = counter() as () => string;
 
 type State = {
   row: Row;
   rows: Row[];
+  activeInput: InputType;
 };
 
 const initialState: State = {
+  activeInput: 'date',
   row: { amount: 0, date: '', id: getId(), mode: 'edit', rate: 0, targetAmount: 0 },
   rows: [],
 };
@@ -38,6 +40,9 @@ export const updateRow = (field: string, value: string) => {
 
 export const saveRow = () =>
   usePersonStore.setState((state) => ({
+    activeInput: 'date',
     row: { ...initialState.row, id: getId() },
     rows: [...state.rows, { ...state.row, mode: 'view' }],
   }));
+
+export const setActiveInput = (activeInput: InputType) => usePersonStore.setState({ activeInput });

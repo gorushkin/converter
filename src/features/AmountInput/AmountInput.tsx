@@ -12,6 +12,7 @@ export const AmountInput = ({ values }: AmountInputProps) => {
       onChange={(value) => {
         updateRow('amount', value);
       }}
+      name="amount"
       value={values.amount.toString()}
     />
   );

@@ -2,12 +2,11 @@ import { useEffect, useMemo } from 'react';
 
 import { Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-
-import styles from './Body.module.scss';
-
 import { AmountInput } from 'src/features/AmountInput';
 import { DateInput } from 'src/features/DateInput';
 import { store, saveRow } from 'src/store';
+
+import styles from './Body.module.scss';
 
 type Row = {
   date: string;
