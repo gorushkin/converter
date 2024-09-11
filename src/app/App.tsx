@@ -1,6 +1,6 @@
 import { Row } from 'antd';
 import { Body } from 'src/widgets/Body';
-import { Header } from 'src/widgets/Header/Header';
+import { Header } from 'src/widgets/Header';
 
 import styles from './App.module.css';
 

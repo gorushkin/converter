@@ -9,10 +9,12 @@ type State = {
   row: Row;
   rows: Row[];
   activeInput: InputType;
+  isActive: (name: InputType) => boolean;
 };
 
 const initialState: State = {
   activeInput: 'date',
+  isActive: (name) => initialState.activeInput === name,
   row: { amount: 0, date: '', id: getId(), mode: 'edit', rate: 0, targetAmount: 0 },
   rows: [],
 };
@@ -34,7 +36,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
 
 export const store = createSelectors(usePersonStore);
 
-export const updateRow = (field: string, value: string) => {
+export const updateRow = (field: 'date' | 'amount' | 'rate', value: string) => {
   usePersonStore.setState((state) => ({ row: { ...state.row, [field]: value } }));
 };
 
