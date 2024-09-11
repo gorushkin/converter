@@ -4,17 +4,11 @@ import { Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { AmountInput } from 'src/features/AmountInput';
 import { DateInput } from 'src/features/DateInput';
-import { store, saveRow } from 'src/store';
+import { store } from 'src/store';
+import { saveRow, verifyRow } from 'src/store/store';
+import { Row } from 'src/store/types';
 
 import styles from './Body.module.scss';
-
-type Row = {
-  date: string;
-  amount: number;
-  rate: number;
-  targetAmount: number;
-  mode: 'edit' | 'view';
-};
 
 const columns: ColumnsType<Row> = [
   {
@@ -58,6 +52,8 @@ export const Body = () => {
   const row = store.use.row();
   const rows = store.use.rows();
 
+  const isRowValid = verifyRow();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
@@ -65,7 +61,9 @@ export const Body = () => {
   useEffect(() => {
     const handlePress = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
-        saveRow();
+        if (isRowValid) {
+          saveRow();
+        }
       }
     };
 
@@ -74,7 +72,7 @@ export const Body = () => {
     return () => {
       document.removeEventListener('keydown', handlePress);
     };
-  }, []);
+  }, [isRowValid]);
 
   const data = useMemo(() => [...rows, row], [row, rows]);
 

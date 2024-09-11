@@ -1,1 +1,1 @@
-export { updateRow, saveRow, store } from './store';
+export { updateRow, saveRow, store, validators, verifyRow } from './store';

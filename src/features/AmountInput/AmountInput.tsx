@@ -1,13 +1,9 @@
 import { Input } from 'src/shared/Input';
-import { updateRow } from 'src/store';
+import { updateRow, validators } from 'src/store';
 import { Row } from 'src/store/types';
 
 type AmountInputProps = {
   values: Row;
-};
-
-const validateNumber = (number: string) => {
-  return !isNaN(Number(number));
 };
 
 export const AmountInput = ({ values }: AmountInputProps) => {
@@ -17,5 +13,5 @@ export const AmountInput = ({ values }: AmountInputProps) => {
     updateRow('amount', sanitizeNumericInput);
   };
 
-  return <Input onChange={handleChange} name="amount" validator={validateNumber} value={values.amount.toString()} />;
+  return <Input onChange={handleChange} name="amount" validator={validators.amount} value={values.amount.toString()} />;
 };

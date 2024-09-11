@@ -5,6 +5,22 @@ import { Row, InputType } from './types';
 
 const getId = counter() as () => string;
 
+const dateValidator = (date: string) => {
+  const dateRegex = /^\d{2}\/\d{2}\/\d{2}$/;
+
+  return dateRegex.test(date);
+};
+
+const amountValidator = (amount: string) => {
+  const amountRegex = /^\d+(\.\d{1,2})?$/;
+  return amountRegex.test(amount) && parseFloat(amount) > 0;
+};
+
+export const validators: Record<InputType, (value: string) => boolean> = {
+  amount: amountValidator,
+  date: dateValidator,
+};
+
 type State = {
   row: Row;
   rows: Row[];
@@ -15,7 +31,7 @@ type State = {
 const initialState: State = {
   activeInput: 'date',
   isActive: (name) => initialState.activeInput === name,
-  row: { amount: 0, date: '', id: getId(), mode: 'edit', rate: 0, targetAmount: 0 },
+  row: { amount: 0, date: '', id: getId(), isValid: false, mode: 'edit', rate: 0, targetAmount: 0 },
   rows: [],
 };
 
@@ -48,3 +64,9 @@ export const saveRow = () =>
   }));
 
 export const setActiveInput = (activeInput: InputType) => usePersonStore.setState({ activeInput });
+
+export const verifyRow = () => {
+  const row = store.use.row();
+
+  return validators.date(row.date) && validators.amount(row.amount.toString());
+};

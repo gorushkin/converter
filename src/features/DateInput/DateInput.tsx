@@ -1,15 +1,9 @@
 import { Input } from 'src/shared/Input/Input';
-import { updateRow } from 'src/store';
+import { updateRow, validators } from 'src/store';
 import { Row } from 'src/store/types';
 
 type DateInputProps = {
   values: Row;
-};
-
-const validateDate = (date: string) => {
-  const dateRegex = /^\d{2}\/\d{2}\/\d{2}$/;
-
-  return dateRegex.test(date);
 };
 
 const convertToFormattedDate = (value: string) => {
@@ -34,5 +28,5 @@ export const DateInput = ({ values }: DateInputProps) => {
     updateRow('date', dateFormatted);
   };
 
-  return <Input validator={validateDate} name="date" onChange={handleChange} value={values.date} />;
+  return <Input validator={validators.date} name="date" onChange={handleChange} value={values.date} />;
 };

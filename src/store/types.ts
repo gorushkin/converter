@@ -5,6 +5,7 @@ export type Row = {
   targetAmount: number;
   mode: 'edit' | 'view';
   id?: string;
+  isValid: boolean;
 };
 
 export type InputType = 'date' | 'amount';
