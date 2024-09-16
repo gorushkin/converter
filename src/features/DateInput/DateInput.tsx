@@ -1,10 +1,6 @@
+import { observer } from 'mobx-react-lite';
 import { Input } from 'src/shared/Input/Input';
-import { updateRow, validators } from 'src/store';
-import { Row } from 'src/store/types';
-
-type DateInputProps = {
-  values: Row;
-};
+import { Cell } from 'src/store';
 
 const convertToFormattedDate = (value: string) => {
   const updatedValue = value
@@ -19,14 +15,20 @@ const convertToFormattedDate = (value: string) => {
   return updatedValue;
 };
 
-export const DateInput = ({ values }: DateInputProps) => {
+type DateInputProps = {
+  cell: Cell<string>;
+};
+
+export const DateInput = observer(({ cell }: DateInputProps) => {
+  const { isValid, setValue, value } = cell;
+
   const handleChange = (value: string) => {
     const sanitizeNumberInput = value.replace(/\D/g, '');
 
     const dateFormatted = convertToFormattedDate(sanitizeNumberInput);
 
-    updateRow('date', dateFormatted);
+    setValue(dateFormatted);
   };
 
-  return <Input validator={validators.date} name="date" onChange={handleChange} value={values.date} />;
-};
+  return <Input isValid={isValid} name="date" onChange={handleChange} value={value} />;
+});
