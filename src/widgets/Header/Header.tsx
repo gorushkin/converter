@@ -1,18 +1,14 @@
-import { useState } from 'react';
-
 import { Button } from 'antd';
+import { observer } from 'mobx-react-lite';
 import { Currency } from 'src/shared/types';
+import { store } from 'src/store';
 
 import styles from './Header.module.scss';
 
 const currencies: Currency[] = ['USD', 'EUR', 'NZD', 'TRY', 'RUB'];
 
-export const Header = () => {
-  const [baseCurrency, setBaseCurrency] = useState<Currency>('USD');
-
-  const handleBaseCurrencyChange = (currency: Currency) => {
-    setBaseCurrency(currency);
-  };
+export const Header = observer(() => {
+  const { setTargetCurrency, targetCurrency } = store;
 
   return (
     <div className={styles.wrapper}>
@@ -26,11 +22,11 @@ export const Header = () => {
         <p>Target currency</p>
         <div className={styles.buttonWrapper}>
           {currencies.map((currency) => {
-            const isActive = currency === baseCurrency;
+            const isActive = currency === targetCurrency;
             const buttonType = isActive ? 'primary' : 'default';
 
             return (
-              <Button type={buttonType} key={currency} onClick={() => handleBaseCurrencyChange(currency)}>
+              <Button type={buttonType} key={currency} onClick={() => setTargetCurrency(currency)}>
                 {currency}
               </Button>
             );
@@ -39,4 +35,4 @@ export const Header = () => {
       </div>
     </div>
   );
-};
+});
