@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
 import { Button } from 'antd';
+import { Currency } from 'src/shared/types';
 
 import styles from './Header.module.scss';
-
-type Currency = 'USD' | 'EUR' | 'NZD' | 'TRY' | 'RUB';
 
 const currencies: Currency[] = ['USD', 'EUR', 'NZD', 'TRY', 'RUB'];
 

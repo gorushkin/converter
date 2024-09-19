@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx';
-import { counter } from 'src/utils';
 
 import { Row } from './row';
 
@@ -8,7 +7,16 @@ export class Store {
   currentRow: Row;
   activeInput: 'date' | 'amount' = 'date';
 
-  private getId = counter() as () => string;
+  private counter = (): (() => string) => {
+    let i = 0;
+
+    return (): string => {
+      i += 1;
+      return i.toString();
+    };
+  };
+
+  private getId = this.counter();
 
   constructor() {
     this.currentRow = new Row(this.getId());

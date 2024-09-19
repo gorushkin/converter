@@ -1,43 +1,61 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx';
-import { getRate } from 'src/api';
-import { counter } from 'src/utils';
+import { ApiClient } from 'src/api';
+import { Currency } from 'src/shared/types';
+import { getInputFormatDate } from 'src/utils';
 
 import { Cell } from './cell';
 import { validators } from './validators';
 
 type RowValues = {
-  amount: number;
+  amount: string;
   date: string;
   id: string;
   isValid: boolean;
-  rate: number;
+  rate: string;
 };
 
 export class Row {
   isValid = false;
   id: string;
-  amount: Cell<number>;
-  date: Cell<string>;
-  rate = new Cell<number>(0);
-  result = new Cell<number>(0);
-  getId = counter() as () => string;
+  amount = new Cell(0, validators.number);
+  date = new Cell('', validators.date);
+  rate = new Cell(0, validators.number);
+  result = new Cell(0);
+  targetCurrency: Currency = 'NZD';
   mode: 'edit' | 'view' = 'edit';
+
+  private apiClient = new ApiClient();
 
   constructor(id: string) {
     this.isValid = false;
     this.id = id;
-    this.amount = new Cell(0, validators.amount);
-    this.date = new Cell('', validators.date);
 
     makeAutoObservable(this);
 
     reaction(
-      () => [this.amount.data, this.date.data],
-      ([amount, data]) => {
-        if (amount.isValid && data.isValid) {
+      () => [this.date.data],
+      ([data]) => {
+        if (data.isValid) {
           this.isValid = true;
           void this.updateRate();
         }
+      }
+    );
+
+    reaction(
+      () => [this.amount.data, this.rate.data],
+      ([amount, rate]) => {
+        if (amount.isValid && rate.isValid) {
+          const result = Number(this.amount.value) * Number(this.rate.value);
+          this.result.setValue(String(result));
+        }
+      }
+    );
+
+    reaction(
+      () => this.rate.data,
+      (rate) => {
+        console.log(rate);
       }
     );
   }
@@ -55,15 +73,25 @@ export class Row {
       date: this.date.value,
       id: this.id,
       isValid: this.isValid,
-      rate: 0,
+      rate: this.rate.value,
     };
   }
 
   updateRate = async () => {
-    const rate = await getRate(this.date.value, 'usd');
+    const convertedDate = getInputFormatDate(this.date.value);
+    const result = await this.apiClient.fetchCurrencyRate(convertedDate);
+
+    if (!result.ok) {
+      console.log('Something went wrong');
+      return;
+    }
+
+    const rate = result.data.rates[this.targetCurrency] ?? 0;
+
     runInAction(() => {
       this.rate.setValue(rate);
-      this.result.setValue(this.amount.value * rate);
+      const result = Number(this.amount.value) * rate;
+      this.result.setValue(result);
     });
   };
 

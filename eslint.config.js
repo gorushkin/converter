@@ -40,7 +40,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'unused-imports/no-unused-imports': 'error',
-      'no-console': 'error',
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
       'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
       'react-hooks/exhaustive-deps': 'error',
       'perfectionist/sort-objects': 'warn',

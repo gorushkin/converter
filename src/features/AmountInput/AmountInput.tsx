@@ -9,10 +9,7 @@ type AmountInputProps = {
 export const AmountInput = observer(({ cell }: AmountInputProps) => {
   const { isValid, setValue, value } = cell;
 
-  const handleChange = (value: string) => {
-    const sanitizeNumericInput = value.replace(/\D/g, '');
-    setValue(Number(sanitizeNumericInput));
-  };
+  // TODO: return sanitizeNumericInput
 
-  return <Input onChange={handleChange} name="amount" isValid={isValid} value={value.toString()} />;
+  return <Input onChange={setValue} name="amount" isValid={isValid} value={value.toString()} />;
 });

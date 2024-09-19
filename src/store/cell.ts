@@ -1,24 +1,30 @@
 import { makeAutoObservable } from 'mobx';
 
-export class Cell<T> {
-  value: T;
-  formatValidator: (value: string) => boolean;
-  private initValue: T;
+type Validator = (value: string) => boolean;
 
-  constructor(value: T, validator: (value: string) => boolean = () => true) {
-    this.value = value;
-    this.initValue = value;
-    this.formatValidator = validator;
+const defaultValidator: Validator = () => true;
+
+export class Cell<T> {
+  value: string;
+  validator = defaultValidator;
+  private initValue: string;
+
+  constructor(value: T, validator?: Validator) {
+    this.value = String(value);
+    this.initValue = String(value);
+    if (validator) {
+      this.validator = validator;
+    }
 
     makeAutoObservable(this);
   }
 
-  setValue = (value: T) => {
-    this.value = value;
+  setValue = (value: string | number) => {
+    this.value = String(value);
   };
 
   get isValid() {
-    return this.formatValidator(String(this.value));
+    return this.validator(this.value);
   }
 
   reset = () => {
