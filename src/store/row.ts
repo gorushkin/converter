@@ -11,19 +11,20 @@ type RowValues = {
   rate: string;
 };
 
+type ActiveInputType = symbol | null;
+
 export class Row {
-  isValid = false;
   id: string;
   amount = new Cell(0, validators.number);
   date = new Cell('', validators.date);
   rate = new Cell(0, validators.number);
   result = new Cell(0);
-  mode: 'edit' | 'view' = 'edit';
+  mode: 'open' | 'closed' = 'open';
+  activeInput: ActiveInputType = null;
 
   constructor(id: string) {
-    this.isValid = false;
     this.id = id;
-
+    this.setActiveInput(this.date.symbol);
     makeAutoObservable(this);
   }
 
@@ -34,7 +35,7 @@ export class Row {
     this.result.reset();
   };
 
-  get row(): RowValues {
+  get values(): RowValues {
     return {
       amount: this.amount.value,
       date: this.date.value,
@@ -44,11 +45,31 @@ export class Row {
     };
   }
 
+  get isValid() {
+    return [this.amount, this.date, this.rate].every((cell) => cell.isValid);
+  }
+
   close = () => {
-    this.mode = 'view';
+    this.mode = 'closed';
   };
 
   edit = () => {
-    this.mode = 'edit';
+    this.mode = 'open';
   };
+
+  get isOpen() {
+    return this.mode === 'closed';
+  }
+
+  get isClosed() {
+    return this.mode === 'open';
+  }
+
+  setActiveInput = (symbol: ActiveInputType) => {
+    this.activeInput = symbol;
+  };
+
+  get isActive() {
+    return (symbol: ActiveInputType) => symbol === this.activeInput;
+  }
 }

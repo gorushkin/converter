@@ -1,3 +1,7 @@
 .wrapper {
   margin-bottom: 0;
+
+  input:focus {
+    border: 1px solid rgb(24, 24, 165) !important;
+  }
 }

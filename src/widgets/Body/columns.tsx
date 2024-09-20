@@ -14,14 +14,16 @@ export const columns: ColumnsType<Row> = [
   {
     dataIndex: 'date',
     key: 'date',
-    render: (cell: Cell<string>) => <DateInput cell={cell} />,
+    render: (cell: Cell<string>, row: Row) => {
+      return row.isOpen ? <RenderCell cell={cell} /> : <DateInput cell={cell} />;
+    },
     title: 'Date',
   },
   {
     dataIndex: 'amount',
     key: 'amount',
-    render: (cell: Cell<number>) => {
-      return <AmountInput cell={cell} />;
+    render: (cell: Cell<number>, row: Row) => {
+      return row.isOpen ? <RenderCell cell={cell} /> : <AmountInput cell={cell} />;
     },
     title: 'Amount',
   },

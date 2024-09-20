@@ -8,6 +8,7 @@ export class Cell<T> {
   value: string;
   validator = defaultValidator;
   private initValue: string;
+  symbol = Symbol();
 
   constructor(value: T, validator?: Validator) {
     this.value = String(value);
@@ -33,6 +34,7 @@ export class Cell<T> {
 
   get data() {
     return {
+      id: this.symbol,
       isValid: this.isValid,
       value: this.value,
     };

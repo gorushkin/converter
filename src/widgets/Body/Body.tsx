@@ -16,7 +16,11 @@ export const Body = observer(() => {
   useEffect(() => {
     const handlePress = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
-        saveRow();
+        const result = saveRow();
+
+        if (!result) return;
+
+        void navigator.clipboard.writeText(result);
       }
     };
 

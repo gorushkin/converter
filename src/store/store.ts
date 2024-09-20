@@ -59,6 +59,8 @@ export class Store {
   updateCurrentRate = () => {
     const rate = this.rates[this.targetCurrency] ?? 0;
 
+    if (!this.currentRow.date.isValid) return;
+
     runInAction(() => {
       this.currentRow.rate.setValue(rate);
       const result = Number(this.currentRow.amount.value) * rate;
@@ -96,7 +98,9 @@ export class Store {
 
     this.currentRow.close();
     this._rows = [this.currentRow, ...this._rows];
+    const result = this.currentRow.result.value;
     this.addNewRow();
+    return result;
   };
 
   get rows() {

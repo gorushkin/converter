@@ -20,7 +20,7 @@ type DateInputProps = {
 };
 
 export const DateInput = observer(({ cell }: DateInputProps) => {
-  const { isValid, setValue, value } = cell;
+  const { isValid, setValue } = cell;
 
   const handleChange = (value: string) => {
     const sanitizeNumberInput = value.replace(/\D/g, '');
@@ -30,5 +30,5 @@ export const DateInput = observer(({ cell }: DateInputProps) => {
     setValue(dateFormatted);
   };
 
-  return <Input isValid={isValid} name="date" onChange={handleChange} value={value} />;
+  return <Input {...cell} name="date" onChange={handleChange} isValid={isValid} />;
 });
