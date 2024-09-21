@@ -39,6 +39,7 @@ export const Input = observer((props: InputProps) => {
   useEffect(() => {
     if (isInputActive && input.current?.input) {
       input.current?.input.focus();
+      input.current?.input.select();
     }
   }, [isInputActive]);
 
