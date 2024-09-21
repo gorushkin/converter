@@ -3,12 +3,14 @@ import { useEffect } from 'react';
 import { Table } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { store } from 'src/store';
+import { numberToCopyCurrency, updateClipboard } from 'src/utils';
 
 import styles from './Body.module.scss';
 import { columns } from './columns';
 
 export const Body = observer(() => {
   const { rows, saveRow } = store;
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
@@ -19,8 +21,7 @@ export const Body = observer(() => {
         const result = saveRow();
 
         if (!result) return;
-
-        void navigator.clipboard.writeText(result);
+        updateClipboard(numberToCopyCurrency(result));
       }
     };
 
