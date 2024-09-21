@@ -9,7 +9,7 @@ import styles from './Body.module.scss';
 import { columns } from './columns';
 
 export const Body = observer(() => {
-  const { isCurrentRowValid, rows, saveRow, switchActiveInput } = store;
+  const { isRowReady, rows, saveRow, switchActiveInput } = store;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,7 +18,7 @@ export const Body = observer(() => {
   useEffect(() => {
     const handlePress = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
-        if (!isCurrentRowValid) {
+        if (!isRowReady) {
           return switchActiveInput();
         }
 
@@ -32,7 +32,7 @@ export const Body = observer(() => {
     return () => {
       document.removeEventListener('keydown', handlePress);
     };
-  }, [isCurrentRowValid, saveRow, switchActiveInput]);
+  }, [isRowReady, saveRow, switchActiveInput]);
 
   return (
     <form onSubmit={handleSubmit} className={styles.wrapper}>

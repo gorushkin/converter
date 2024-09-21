@@ -3,7 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import { Cell } from './cell';
 import { validators } from './validators';
 
-type RowValues = {
+export type RowValues = {
   amount: string;
   date: string;
   id: string;
@@ -23,9 +23,16 @@ export class Row {
   activeInput: ActiveInputType = null;
   inputs: symbol[] = [this.date.symbol, this.amount.symbol];
 
-  constructor(id: string) {
+  constructor(id: string, values?: RowValues) {
     this.id = id;
     this.setActiveInput(this.date.symbol);
+
+    if (values) {
+      this.amount.setValue(values.amount);
+      this.date.setValue(values.date);
+      this.rate.setValue(values.rate);
+    }
+
     makeAutoObservable(this);
   }
 
@@ -87,4 +94,12 @@ export class Row {
 
     this.setActiveInput(this.inputs[currentIndex + 1]);
   };
+
+  get isRowReady() {
+    if (!this.activeInput) {
+      return this.isValid;
+    }
+
+    return this.activeInput === this.inputs[this.inputs.length - 1];
+  }
 }

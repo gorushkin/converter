@@ -85,7 +85,8 @@ export class Store {
   };
 
   private addNewRow = () => {
-    this.currentRow = new Row(this.getId());
+    const values = this.currentRow.values;
+    this.currentRow = new Row(this.getId(), values);
   };
 
   saveRow = () => {
@@ -116,8 +117,8 @@ export class Store {
     return this.currentRow.isActive;
   }
 
-  get isCurrentRowValid() {
-    return this.currentRow.isValid;
+  get isRowReady() {
+    return this.currentRow.isRowReady;
   }
 
   switchActiveInput = () => {
