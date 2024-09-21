@@ -7,11 +7,10 @@ import { Row } from './row';
 
 export class Store {
   _rows: Row[] = [];
-  currentRow: Row;
-  activeInput: 'date' | 'amount' = 'date';
+  private currentRow: Row;
   targetCurrency: Currency = 'USD';
   baseCurrency: Currency = 'RUB';
-  rates: Rates = {};
+  private rates: Rates = {};
 
   private counter = (): (() => string) => {
     let i = 0;
@@ -56,7 +55,7 @@ export class Store {
     );
   }
 
-  updateCurrentRate = () => {
+  private updateCurrentRate = () => {
     const rate = this.rates[this.targetCurrency] ?? 0;
 
     if (!this.currentRow.date.isValid) return;
@@ -68,7 +67,7 @@ export class Store {
     });
   };
 
-  updateRate = async () => {
+  private updateRate = async () => {
     const convertedDate = getInputFormatDate(this.currentRow.date.value);
     const result = await this.apiClient.fetchCurrencyRate(convertedDate);
 
@@ -90,12 +89,6 @@ export class Store {
   };
 
   saveRow = () => {
-    const isCurrentRowValid = this.currentRow.isValid;
-
-    if (!isCurrentRowValid) {
-      return;
-    }
-
     this.currentRow.close();
     this._rows = [this.currentRow, ...this._rows];
     const result = this.currentRow.result.value;
@@ -113,6 +106,22 @@ export class Store {
 
   setBaseCurrency = (currency: Currency) => {
     this.baseCurrency = currency;
+  };
+
+  setActiveInput = (symbol: symbol) => {
+    this.currentRow.setActiveInput(symbol);
+  };
+
+  get isActive() {
+    return this.currentRow.isActive;
+  }
+
+  get isCurrentRowValid() {
+    return this.currentRow.isValid;
+  }
+
+  switchActiveInput = () => {
+    this.currentRow.switchActiveInput();
   };
 }
 

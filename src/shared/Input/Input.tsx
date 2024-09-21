@@ -26,13 +26,11 @@ export const Input = observer((props: InputProps) => {
     onChange(e.target.value);
   };
 
-  const { currentRow } = store;
+  const { isActive, setActiveInput } = store;
 
   const handleFocus = () => {
-    currentRow.setActiveInput(symbol);
+    setActiveInput(symbol);
   };
-
-  const isActive = currentRow.isActive;
 
   const isInputActive = isActive(symbol);
 

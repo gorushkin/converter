@@ -21,6 +21,7 @@ export class Row {
   result = new Cell(0);
   mode: 'open' | 'closed' = 'open';
   activeInput: ActiveInputType = null;
+  inputs: symbol[] = [this.date.symbol, this.amount.symbol];
 
   constructor(id: string) {
     this.id = id;
@@ -72,4 +73,18 @@ export class Row {
   get isActive() {
     return (symbol: ActiveInputType) => symbol === this.activeInput;
   }
+
+  switchActiveInput = () => {
+    if (!this.activeInput) {
+      return;
+    }
+
+    const currentIndex = this.inputs.indexOf(this.activeInput);
+
+    if (currentIndex === this.inputs.length - 1) {
+      return this.setActiveInput(this.inputs[0]);
+    }
+
+    this.setActiveInput(this.inputs[currentIndex + 1]);
+  };
 }
