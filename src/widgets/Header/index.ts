@@ -1,1 +1,1 @@
-export { Header } from './Header';
+export { Currencies } from './Currencies';

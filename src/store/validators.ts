@@ -1,6 +1,6 @@
 import { validateUserDate } from 'src/utils';
 
-export type InputType = 'date' | 'amount';
+export type InputType = 'date' | 'amount' | 'memo';
 export type ValueType = 'string' | 'number';
 
 const dateValidator = (date: string) => validateUserDate(date);

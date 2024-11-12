@@ -13,7 +13,7 @@ type InputProps = {
   name: InputType;
   validator?: (value: string) => boolean;
   onFocus?: () => void;
-  isValid: boolean;
+  isValid?: boolean;
   symbol: symbol;
 };
 

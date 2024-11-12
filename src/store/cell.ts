@@ -39,4 +39,8 @@ export class Cell<T> {
       value: this.value,
     };
   }
+
+  get rawData() {
+    return this.value;
+  }
 }

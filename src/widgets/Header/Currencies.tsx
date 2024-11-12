@@ -3,11 +3,11 @@ import { observer } from 'mobx-react-lite';
 import { Currency } from 'src/shared/types';
 import { store } from 'src/store';
 
-import styles from './Header.module.scss';
+import styles from './Currencies.module.scss';
 
 const currencies: Currency[] = ['USD', 'EUR', 'NZD', 'TRY', 'RUB'];
 
-export const Header = observer(() => {
+export const Currencies = observer(() => {
   const { setTargetCurrency, targetCurrency } = store;
 
   return (

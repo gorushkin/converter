@@ -9,7 +9,11 @@ import styles from './Body.module.scss';
 import { columns } from './columns';
 
 export const Body = observer(() => {
-  const { isRowReady, rows, saveRow, switchActiveInput } = store;
+  const { isRowReady, load, rows, saveRow, switchActiveInput } = store;
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -4,3 +4,11 @@
   width: 100%;
   flex-wrap: nowrap;
 }
+
+.header {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  background-color: #f1f1f1;
+  padding: 10px 20px
+}

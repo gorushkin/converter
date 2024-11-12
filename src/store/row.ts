@@ -5,6 +5,8 @@ import { validators } from './validators';
 
 export type RowValues = {
   amount: string;
+  memo: string;
+  payee: string;
   date: string;
   id: string;
   isValid: boolean;
@@ -18,6 +20,8 @@ export class Row {
   amount = new Cell(0, validators.number);
   date = new Cell('', validators.date);
   rate = new Cell(0, validators.number);
+  memo = new Cell('');
+  payee = new Cell('');
   result = new Cell(0);
   mode: 'open' | 'closed' = 'open';
   activeInput: ActiveInputType = null;
@@ -31,6 +35,7 @@ export class Row {
       this.amount.setValue(values.amount);
       this.date.setValue(values.date);
       this.rate.setValue(values.rate);
+      this.memo.setValue(values.memo);
     }
 
     makeAutoObservable(this);
@@ -41,6 +46,8 @@ export class Row {
     this.date.reset();
     this.rate.reset();
     this.result.reset();
+    this.memo.reset();
+    this.payee.reset();
   };
 
   get values(): RowValues {
@@ -49,6 +56,8 @@ export class Row {
       date: this.date.value,
       id: this.id,
       isValid: this.isValid,
+      memo: this.memo.value,
+      payee: this.payee.value,
       rate: this.rate.value,
     };
   }
@@ -102,4 +111,14 @@ export class Row {
 
     return this.activeInput === this.inputs[this.inputs.length - 1];
   }
+
+  get rawDate() {
+    return [this.amount, this.date, this.rate].map((cell) => cell.rawData);
+  }
+
+  loadValues = (values: RowValues) => {
+    this.amount.setValue(values.amount);
+    this.date.setValue(values.date);
+    this.rate.setValue(values.rate);
+  };
 }

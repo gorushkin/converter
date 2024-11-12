@@ -2,8 +2,10 @@ import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import { ApiClient, Rates } from 'src/api';
 import { Currency } from 'src/shared/types';
 import { getInputFormatDate } from 'src/utils';
+import { counter } from 'src/utils/counter';
+import { statementStorage } from 'src/utils/storage';
 
-import { Row } from './row';
+import { Row, RowValues } from './row';
 
 export class Store {
   _rows: Row[] = [];
@@ -11,21 +13,14 @@ export class Store {
   targetCurrency: Currency = 'USD';
   baseCurrency: Currency = 'RUB';
   private rates: Rates = {};
-
-  private counter = (): (() => string) => {
-    let i = 0;
-
-    return (): string => {
-      i += 1;
-      return i.toString();
-    };
-  };
-
-  private getId = this.counter();
+  private counter = counter();
   private apiClient = new ApiClient();
+  statement: RowValues[] = [];
+  storage = statementStorage;
 
   constructor() {
-    this.currentRow = new Row(this.getId());
+    this.currentRow = new Row(this.counter.next());
+
     makeAutoObservable(this);
 
     reaction(
@@ -67,6 +62,10 @@ export class Store {
     });
   };
 
+  get isStatementExist() {
+    return this.statement.length > 0;
+  }
+
   private updateRate = async () => {
     const convertedDate = getInputFormatDate(this.currentRow.date.value);
     const result = await this.apiClient.fetchCurrencyRate(convertedDate);
@@ -86,7 +85,7 @@ export class Store {
 
   private addNewRow = () => {
     const values = this.currentRow.values;
-    this.currentRow = new Row(this.getId(), values);
+    this.currentRow = new Row(this.counter.next(), values);
   };
 
   saveRow = () => {
@@ -99,6 +98,10 @@ export class Store {
 
   get rows() {
     return [this.currentRow, ...this._rows];
+  }
+
+  get values() {
+    return this.rows.map(({ amount, date, memo, payee }) => [date, payee, memo, amount].map((cell) => cell.value));
   }
 
   setTargetCurrency = (currency: Currency) => {
@@ -123,6 +126,59 @@ export class Store {
 
   switchActiveInput = () => {
     this.currentRow.switchActiveInput();
+  };
+
+  sort = () => {
+    console.log('sort');
+    console.log(JSON.stringify(this._rows, null, 2));
+  };
+
+  reset = () => {
+    this._rows = [];
+    this.storage.clear();
+    this.statement = [];
+    this.counter.reset();
+    this.currentRow = new Row(this.counter.next());
+  };
+
+  save = () => {
+    const statements = [this.currentRow, ...this._rows].map((row) => row.values);
+    this.storage.set(statements);
+    this.statement = statements;
+  };
+
+  importStatement = () => {
+    const statements = this.statement.map((row) => new Row(row.id, row));
+
+    const [currentRow, ...rows] = statements;
+
+    runInAction(() => {
+      this._rows = rows;
+      if (currentRow) {
+        this.currentRow = currentRow;
+      }
+    });
+  };
+
+  load = () => {
+    const statements = this.storage.get();
+    this.statement = statements;
+  };
+
+  exportCSV = () => {
+    const rows = this.values.map((row) => {
+      return Object.values(row)
+        .map((value) => value)
+        .join(',');
+    });
+
+    const fileContent = rows.join('\n');
+
+    return new Blob([fileContent], { type: 'text/plain' });
+  };
+
+  removeRow = (id: string) => {
+    this._rows = this._rows.filter((row) => row.id !== id);
   };
 }
 
