@@ -1,18 +1,31 @@
 import { observer } from 'mobx-react-lite';
-import { store } from 'src/store';
+import { store, type Row } from 'src/store';
+
+import styles from './RowAction.module.scss';
 
 type RowActionProps = {
   className?: string;
-  id: string;
+  row: Row;
 };
-export const RowAction = observer(({ id }: RowActionProps) => {
+export const RowAction = observer(({ row }: RowActionProps) => {
   const handleRemoveClick = () => {
-    store.removeRow(id);
+    store.removeRow(row.id);
   };
 
+  const handleSaveClick = () => {
+    store.saveRow();
+  };
+
+  const isButtonEnabled = row.isValid && row.isEditMode;
+
   return (
-    <div>
-      <button onClick={handleRemoveClick}>delete</button>
+    <div className={styles.wrapper}>
+      <button type="submit" disabled={!isButtonEnabled} onClick={handleSaveClick}>
+        save
+      </button>
+      <button type="button" onClick={handleRemoveClick}>
+        delete
+      </button>
     </div>
   );
 });

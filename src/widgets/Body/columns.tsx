@@ -17,23 +17,39 @@ export const columns: ColumnsType<Row> = [
     dataIndex: 'date',
     key: 'date',
     render: (cell: Cell<string>, row: Row) => {
-      return row.isOpen ? <RenderTextCell cell={cell} /> : <DateInput cell={cell} />;
+      return row.isViewMode ? <RenderTextCell cell={cell} /> : <DateInput cell={cell} />;
     },
     title: 'Date',
   },
   {
+    dataIndex: 'outflow',
+    key: 'outflow',
+    render: (cell: Cell<number>, row: Row) => {
+      return row.isViewMode ? <RenderCurrencyCell cell={cell} /> : <AmountInput cell={cell} />;
+    },
+    title: 'Outflow',
+  },
+  {
+    dataIndex: 'inflow',
+    key: 'inflow',
+    render: (cell: Cell<number>, row: Row) => {
+      return row.isViewMode ? <RenderCurrencyCell cell={cell} /> : <AmountInput cell={cell} />;
+    },
+    title: 'Inflow',
+  },
+  {
     dataIndex: 'amount',
     key: 'amount',
-    render: (cell: Cell<number>, row: Row) => {
-      return row.isOpen ? <RenderCurrencyCell cell={cell} /> : <AmountInput cell={cell} />;
+    render: (cell: Cell<string>) => {
+      return <RenderTextCell cell={cell} />;
     },
-    title: 'Amount',
+    title: 'amount',
   },
   {
     dataIndex: 'memo',
     key: 'memo',
     render: (cell: Cell<string>, row: Row) => {
-      return row.isOpen ? <RenderTextCell cell={cell} /> : <AmountInput cell={cell} />;
+      return row.isViewMode ? <RenderTextCell cell={cell} /> : <AmountInput cell={cell} />;
     },
     title: 'Memo',
   },
@@ -54,9 +70,7 @@ export const columns: ColumnsType<Row> = [
   {
     dataIndex: 'action',
     key: 'action',
-    render: (_, row) => {
-      return <RowAction id={row.id} />;
-    },
+    render: (_, row) => <RowAction row={row} />,
     title: 'Actions',
   },
 ];

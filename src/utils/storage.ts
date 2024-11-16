@@ -1,3 +1,4 @@
+import type { Currency } from 'src/shared/types';
 import { RowValues } from 'src/store/row';
 
 class Storage<T> {
@@ -22,4 +23,7 @@ class Storage<T> {
   }
 }
 
-export const statementStorage = new Storage<RowValues[]>([]);
+export const statementStorage = new Storage<{ statements: RowValues[]; currency: Currency }>({
+  currency: 'USD',
+  statements: [],
+});

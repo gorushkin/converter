@@ -6,16 +6,14 @@ const defaultValidator: Validator = () => true;
 
 export class Cell<T> {
   value: string;
-  validator = defaultValidator;
+  validator: Validator;
   private initValue: string;
   symbol = Symbol();
 
   constructor(value: T, validator?: Validator) {
     this.value = String(value);
     this.initValue = String(value);
-    if (validator) {
-      this.validator = validator;
-    }
+    this.validator = validator ?? defaultValidator;
 
     makeAutoObservable(this);
   }

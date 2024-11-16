@@ -1,7 +1,6 @@
-import { makeAutoObservable, reaction, runInAction } from 'mobx';
+import { makeAutoObservable, reaction, runInAction, autorun } from 'mobx';
 import { ApiClient, Rates } from 'src/api';
 import { Currency } from 'src/shared/types';
-import { getInputFormatDate } from 'src/utils';
 import { counter } from 'src/utils/counter';
 import { statementStorage } from 'src/utils/storage';
 
@@ -23,19 +22,16 @@ export class Store {
 
     makeAutoObservable(this);
 
-    reaction(
-      () => this.currentRow.date.data,
-      (data) => {
-        if (data.isValid) {
-          void this.updateRate();
-        }
-      }
-    );
+    autorun(() => {
+      if (!this.currentRow.date.isValid) return;
+
+      void this.updateRate();
+    });
 
     reaction(
-      () => [this.currentRow.amount.data, this.currentRow.rate.data],
+      () => [this.currentRow.amount.data, this.currentRow.rate.data] as const,
       ([amount, rate]) => {
-        if (amount.isValid && rate.isValid) {
+        if (rate.isValid) {
           const result = Number(amount.value) * Number(rate.value);
           this.currentRow.result.setValue(String(result));
         }
@@ -57,8 +53,6 @@ export class Store {
 
     runInAction(() => {
       this.currentRow.rate.setValue(rate);
-      const result = Number(this.currentRow.amount.value) * rate;
-      this.currentRow.result.setValue(String(result));
     });
   };
 
@@ -66,12 +60,15 @@ export class Store {
     return this.statement.length > 0;
   }
 
+  get isCurrentRowValid() {
+    return this.currentRow.isValid;
+  }
+
   private updateRate = async () => {
-    const convertedDate = getInputFormatDate(this.currentRow.date.value);
-    const result = await this.apiClient.fetchCurrencyRate(convertedDate);
+    const result = await this.apiClient.fetchCurrencyRate(this.currentRow.date.value);
 
     if (!result.ok) {
-      console.log('Something went wrong');
+      console.error('Something went wrong');
       return;
     }
 
@@ -85,10 +82,15 @@ export class Store {
 
   private addNewRow = () => {
     const values = this.currentRow.values;
-    this.currentRow = new Row(this.counter.next(), values);
+    this.currentRow = new Row(this.counter.next(), { date: values.date, rate: values.rate });
   };
 
   saveRow = () => {
+    if (!this.currentRow.isValid) {
+      console.error('Row is not valid');
+      return;
+    }
+
     this.currentRow.close();
     this._rows = [this.currentRow, ...this._rows];
     const result = this.currentRow.result.value;
@@ -100,8 +102,18 @@ export class Store {
     return [this.currentRow, ...this._rows];
   }
 
+  get headers() {
+    return ['Date', 'Payee', 'Memo', 'Amount'];
+  }
+
   get values() {
-    return this.rows.map(({ amount, date, memo, payee }) => [date, payee, memo, amount].map((cell) => cell.value));
+    return this.rows.map(({ date, inflow, memo, outflow, payee, rate }) => {
+      const updatedMemo = `[${rate.value} * ${this.targetCurrency}] ${memo.value}`;
+
+      const amount = ((Number(inflow.value) - Number(outflow.value)) * Number(rate.value)).toFixed(2);
+
+      return [date.value, payee.value, updatedMemo, amount];
+    });
   }
 
   setTargetCurrency = (currency: Currency) => {
@@ -112,26 +124,7 @@ export class Store {
     this.baseCurrency = currency;
   };
 
-  setActiveInput = (symbol: symbol) => {
-    this.currentRow.setActiveInput(symbol);
-  };
-
-  get isActive() {
-    return this.currentRow.isActive;
-  }
-
-  get isRowReady() {
-    return this.currentRow.isRowReady;
-  }
-
-  switchActiveInput = () => {
-    this.currentRow.switchActiveInput();
-  };
-
-  sort = () => {
-    console.log('sort');
-    console.log(JSON.stringify(this._rows, null, 2));
-  };
+  sort = () => {};
 
   reset = () => {
     this._rows = [];
@@ -142,9 +135,9 @@ export class Store {
   };
 
   save = () => {
-    const statements = [this.currentRow, ...this._rows].map((row) => row.values);
-    this.storage.set(statements);
-    this.statement = statements;
+    // const statements = [this.currentRow, ...this._rows].map((row) => row.values);
+    // this.storage.set({ currency: this.targetCurrency, statements });
+    // this.statement = statements;
   };
 
   importStatement = () => {
@@ -161,24 +154,31 @@ export class Store {
   };
 
   load = () => {
-    const statements = this.storage.get();
-    this.statement = statements;
+    // const { currency, statements } = this.storage.get();
+    // this.statement = statements;
+    // this.targetCurrency = currency;
+    // this.counter.set(statements.length);
   };
 
   exportCSV = () => {
+    const header = this.headers.map((item) => `"${item}"`).join(',');
     const rows = this.values.map((row) => {
       return Object.values(row)
-        .map((value) => value)
+        .map((value) => `"${value}"`)
         .join(',');
     });
 
-    const fileContent = rows.join('\n');
+    const fileContent = header + '\n' + rows.join('\n');
 
     return new Blob([fileContent], { type: 'text/plain' });
   };
 
   removeRow = (id: string) => {
-    this._rows = this._rows.filter((row) => row.id !== id);
+    if (id === this.currentRow.id) {
+      this.currentRow.reset();
+    } else {
+      this._rows = this._rows.filter((row) => row.id !== id);
+    }
   };
 }
 

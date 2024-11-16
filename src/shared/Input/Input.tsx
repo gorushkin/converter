@@ -1,8 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useRef, type ChangeEvent } from 'react';
 
-import { Form, Input as AntdInput, InputRef } from 'antd';
+import { Form, Input as AntdInput, type InputRef } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { store } from 'src/store';
 import { InputType } from 'src/store/validators';
 
 import styles from './Input.module.scss';
@@ -15,43 +14,35 @@ type InputProps = {
   onFocus?: () => void;
   isValid?: boolean;
   symbol: symbol;
+  type?: 'text' | 'number' | 'date';
+  inputRef: React.MutableRefObject<InputRef | null>;
 };
 
 export const Input = observer((props: InputProps) => {
-  const { isValid, name, onChange, symbol, value = '' } = props;
+  const { inputRef, isValid, name, onChange, type = 'text', value = '' } = props;
 
   const validatingStatus = isValid ? 'success' : 'error';
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
 
-  const { isActive, setActiveInput } = store;
-
-  const handleFocus = () => {
-    setActiveInput(symbol);
-  };
-
-  const isInputActive = isActive(symbol);
-
   const input = useRef<InputRef | null>(null);
 
-  useEffect(() => {
-    if (isInputActive && input.current?.input) {
-      input.current?.input.focus();
-      input.current?.input.select();
-    }
-  }, [isInputActive]);
+  const handleFocus = () => {
+    input.current?.select();
+  };
 
   return (
     <Form.Item className={styles.wrapper} validateStatus={validatingStatus}>
       <AntdInput
-        ref={input}
-        autoComplete="off"
         onFocus={handleFocus}
+        ref={inputRef ?? input}
+        autoComplete="off"
         onChange={handleChange}
         name={name}
         value={value}
+        type={type}
       />
     </Form.Item>
   );

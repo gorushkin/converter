@@ -1,1 +1,1 @@
-export type Currency = 'USD' | 'EUR' | 'NZD' | 'TRY' | 'RUB';
+export type Currency = 'USD' | 'EUR' | 'NZD' | 'TRY' | 'RUB' | 'GEL';

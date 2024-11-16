@@ -1,4 +1,5 @@
 import { Button } from 'antd';
+import dayjs from 'dayjs';
 import { observer } from 'mobx-react-lite';
 import { store } from 'src/store';
 
@@ -12,7 +13,8 @@ export const Actions = observer(() => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'my-file.txt';
+    const title = dayjs().toISOString();
+    link.download = `${title}.csv`;
 
     link.click();
 

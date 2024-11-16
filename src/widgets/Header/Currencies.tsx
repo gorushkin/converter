@@ -5,7 +5,7 @@ import { store } from 'src/store';
 
 import styles from './Currencies.module.scss';
 
-const currencies: Currency[] = ['USD', 'EUR', 'NZD', 'TRY', 'RUB'];
+const currencies: Currency[] = ['USD', 'EUR', 'NZD', 'TRY', 'RUB', 'GEL'];
 
 export const Currencies = observer(() => {
   const { setTargetCurrency, targetCurrency } = store;
