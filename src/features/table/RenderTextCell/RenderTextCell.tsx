@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import { RenderCell } from 'src/shared/Cell';
-import { Cell } from 'src/store';
+import { Cell } from 'src/entities/row';
+import { RenderCell } from 'src/shared/ui/Cell';
 
 type RenderTextCellProps<T> = {
   cell: Cell<T>;

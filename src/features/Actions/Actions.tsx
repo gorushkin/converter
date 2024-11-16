@@ -1,11 +1,15 @@
 import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { observer } from 'mobx-react-lite';
-import { store } from 'src/store';
+import { statement } from 'src/entities/statement/model';
+import { statements } from 'src/entities/statements';
+import { SaveStatement } from 'src/features/SaveStatement';
+import { useModal } from 'src/shared/hooks/useModal';
 
 import styles from './Actions.module.scss';
 export const Actions = observer(() => {
-  const { exportCSV, importStatement, isStatementExist, reset, save, sort } = store;
+  const { isStatementExist, reset, sort } = statement;
+  const { exportCSV, loadStatement } = statements;
 
   const handleExport = () => {
     const blob = exportCSV();
@@ -21,15 +25,17 @@ export const Actions = observer(() => {
     URL.revokeObjectURL(url);
   };
 
+  const [isSaveModalOpen, openSaveModal, closeSaveModal] = useModal();
+
   return (
     <div className={styles.wrapper}>
       <Button onClick={sort} type="primary">
         Sort by date
       </Button>
-      <Button onClick={save} type="primary">
+      <Button onClick={openSaveModal} type="primary">
         Save
       </Button>
-      <Button disabled={!isStatementExist} onClick={importStatement} type="primary">
+      <Button disabled={!isStatementExist} onClick={loadStatement} type="primary">
         Import
       </Button>
       <Button onClick={reset} type="primary">
@@ -38,6 +44,7 @@ export const Actions = observer(() => {
       <Button onClick={handleExport} type="primary">
         Export
       </Button>
+      <SaveStatement isOpen={isSaveModalOpen} onClose={closeSaveModal} />
     </div>
   );
 });

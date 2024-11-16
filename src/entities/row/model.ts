@@ -1,34 +1,24 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx';
+import { validators } from 'src/shared/utils';
 import { getCurrentDate } from 'src/utils';
 
 import { Cell } from './cell';
-import { validators } from './validators';
-
-export type RowValues = {
-  inflow: string;
-  outflow: string;
-  memo: string;
-  payee: string;
-  date: string;
-  id: string;
-  isValid: boolean;
-  rate: string;
-};
+import type { RowDTO } from './types';
 
 export class Row {
   id: string;
   inflow = new Cell(0);
   outflow = new Cell(0);
-  amount = new Cell(0, validators.number);
+  amountInBaseCurrency = new Cell(0, validators.number);
   date = new Cell('', validators.date);
-  rate = new Cell(0);
+  exchangeRate = new Cell(0);
   memo = new Cell('');
   payee = new Cell('');
-  result = new Cell(0);
+  amountInTargetCurrency = new Cell(0);
   mode: 'edit' | 'view' = 'edit';
   inputs: symbol[] = [this.date.symbol, this.inflow.symbol, this.outflow.symbol];
 
-  constructor(id: string, values: Partial<RowValues> = {}) {
+  constructor(id: string, values: Partial<RowDTO> = {}) {
     this.id = id;
 
     this.date.setValue(values.date ?? getCurrentDate());
@@ -41,8 +31,8 @@ export class Row {
       this.outflow.setValue(values.outflow);
     }
 
-    if (values.rate) {
-      this.rate.setValue(values.rate);
+    if (values.exchangeRate) {
+      this.exchangeRate.setValue(values.exchangeRate);
     }
 
     if (values.memo) {
@@ -58,7 +48,7 @@ export class Row {
     reaction(
       () => [this.inflow.value, this.outflow.value],
       () => {
-        this.amount.setValue(Number(this.inflow.value) - Number(this.outflow.value));
+        this.amountInBaseCurrency.setValue(Number(this.inflow.value) - Number(this.outflow.value));
       }
     );
 
@@ -81,8 +71,8 @@ export class Row {
     runInAction(() => {
       this.inflow.reset();
       this.outflow.reset();
-      this.rate.reset();
-      this.result.reset();
+      this.exchangeRate.reset();
+      this.amountInTargetCurrency.reset();
       this.memo.reset();
       this.payee.reset();
 
@@ -90,21 +80,21 @@ export class Row {
     });
   };
 
-  get values(): RowValues {
+  get values(): RowDTO {
     return {
       date: this.date.value,
+      exchangeRate: this.exchangeRate.value,
       id: this.id,
       inflow: this.inflow.value,
       isValid: this.isValid,
       memo: this.memo.value,
       outflow: this.outflow.value,
       payee: this.payee.value,
-      rate: this.rate.value,
     };
   }
 
   get isValid() {
-    return [this.date, this.rate, this.amount].every((cell) => cell.isValid);
+    return [this.date, this.exchangeRate, this.amountInBaseCurrency].every((cell) => cell.isValid);
   }
 
   close = () => {
@@ -123,12 +113,12 @@ export class Row {
     return this.mode === 'edit';
   }
 
-  loadValues = (values: RowValues) => {
+  loadValues = (values: RowDTO) => {
     runInAction(() => {
       this.inflow.setValue(values.inflow);
       this.outflow.setValue(values.outflow);
       this.date.setValue(values.date);
-      this.rate.setValue(values.rate);
+      this.exchangeRate.setValue(values.exchangeRate);
     });
   };
 }

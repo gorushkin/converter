@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import { Input } from 'src/shared/Input';
-import { Cell } from 'src/store';
+import { Cell } from 'src/entities/row';
+import { Input } from 'src/shared/ui/Input';
 
 type TextInputProps = {
   cell: Cell<string>;

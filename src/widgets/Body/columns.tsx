@@ -1,10 +1,10 @@
 import { ColumnsType } from 'antd/es/table';
+import type { Cell, Row } from 'src/entities/row';
 import { AmountInput } from 'src/features/table/AmountInput';
 import { DateInput } from 'src/features/table/DateInput';
 import { RenderCurrencyCell } from 'src/features/table/RenderCurrencyCell';
 import { RenderTextCell } from 'src/features/table/RenderTextCell';
 import { RowAction } from 'src/features/table/RowAction';
-import { Cell, Row } from 'src/store';
 
 export const columns: ColumnsType<Row> = [
   {
@@ -38,8 +38,8 @@ export const columns: ColumnsType<Row> = [
     title: 'Inflow',
   },
   {
-    dataIndex: 'amount',
-    key: 'amount',
+    dataIndex: 'amountInBaseCurrency',
+    key: 'amountInBaseCurrency',
     render: (cell: Cell<string>) => {
       return <RenderTextCell cell={cell} />;
     },
@@ -54,14 +54,14 @@ export const columns: ColumnsType<Row> = [
     title: 'Memo',
   },
   {
-    dataIndex: 'rate',
-    key: 'rate',
+    dataIndex: 'exchangeRate',
+    key: 'exchangeRate',
     render: (cell: Cell<number>) => <RenderCurrencyCell cell={cell} />,
     title: 'Rate',
   },
   {
-    dataIndex: 'result',
-    key: 'result',
+    dataIndex: 'amountInTargetCurrency',
+    key: 'amountInTargetCurrency',
     render: (cell: Cell<number>) => {
       return <RenderCurrencyCell cell={cell} />;
     },

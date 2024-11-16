@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 
 import type { InputRef } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { Input } from 'src/shared/Input/Input';
-import { Cell } from 'src/store';
+import { Cell } from 'src/entities/row';
+import { Input } from 'src/shared/ui/Input/Input';
 
 type DateInputProps = {
   cell: Cell<string>;

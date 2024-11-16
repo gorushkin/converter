@@ -1,6 +1,6 @@
-import { RowValues } from 'src/store/row';
+import { RowDTO } from 'src/entities/row';
 
-export const getCSV = (data: RowValues[]) => {
+export const getCSV = (data: RowDTO[]) => {
   const rows = data.map((row) => {
     return Object.values(row)
       .map((value) => value)

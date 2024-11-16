@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import { Input } from 'src/shared/Input';
-import { Cell } from 'src/store';
+import type { Cell } from 'src/entities/row';
+import { Input } from 'src/shared/ui/Input';
 
 type AmountInputProps = {
   cell: Cell<number>;
@@ -8,8 +8,6 @@ type AmountInputProps = {
 
 export const AmountInput = observer(({ cell }: AmountInputProps) => {
   const { setValue, value } = cell;
-
-  // TODO: return sanitizeNumericInput
 
   return <Input onChange={setValue} name="amount" {...cell} value={value.toString()} isValid={cell.isValid} />;
 });

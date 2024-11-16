@@ -1,0 +1,1 @@
+export { statements } from './model';

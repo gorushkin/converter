@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import { RenderCell } from 'src/shared/Cell';
-import { Cell } from 'src/store';
+import { Cell } from 'src/entities/row';
+import { RenderCell } from 'src/shared/ui/Cell';
 import { numberToCopyCurrency, numberToUICurrency } from 'src/utils';
 
 type RenderCurrencyCellProps<T> = {

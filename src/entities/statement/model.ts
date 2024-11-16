@@ -1,12 +1,12 @@
 import { makeAutoObservable, reaction, runInAction, autorun } from 'mobx';
 import { ApiClient, Rates } from 'src/api';
+import type { RowDTO } from 'src/entities/row';
+import { Row } from 'src/entities/row';
 import { Currency } from 'src/shared/types';
 import { counter } from 'src/utils/counter';
 import { statementStorage } from 'src/utils/storage';
 
-import { Row, RowValues } from './row';
-
-export class Store {
+export class Statement {
   _rows: Row[] = [];
   private currentRow: Row;
   targetCurrency: Currency = 'USD';
@@ -14,7 +14,7 @@ export class Store {
   private rates: Rates = {};
   private counter = counter();
   private apiClient = new ApiClient();
-  statement: RowValues[] = [];
+  statement: RowDTO[] = [];
   storage = statementStorage;
 
   constructor() {
@@ -29,11 +29,11 @@ export class Store {
     });
 
     reaction(
-      () => [this.currentRow.amount.data, this.currentRow.rate.data] as const,
+      () => [this.currentRow.amountInBaseCurrency.data, this.currentRow.exchangeRate.data] as const,
       ([amount, rate]) => {
         if (rate.isValid) {
           const result = Number(amount.value) * Number(rate.value);
-          this.currentRow.result.setValue(String(result));
+          this.currentRow.amountInTargetCurrency.setValue(String(result));
         }
       }
     );
@@ -52,7 +52,7 @@ export class Store {
     if (!this.currentRow.date.isValid) return;
 
     runInAction(() => {
-      this.currentRow.rate.setValue(rate);
+      this.currentRow.exchangeRate.setValue(rate);
     });
   };
 
@@ -82,7 +82,7 @@ export class Store {
 
   private addNewRow = () => {
     const values = this.currentRow.values;
-    this.currentRow = new Row(this.counter.next(), { date: values.date, rate: values.rate });
+    this.currentRow = new Row(this.counter.next(), { date: values.date, exchangeRate: values.exchangeRate });
   };
 
   saveRow = () => {
@@ -93,7 +93,7 @@ export class Store {
 
     this.currentRow.close();
     this._rows = [this.currentRow, ...this._rows];
-    const result = this.currentRow.result.value;
+    const result = this.currentRow.amountInTargetCurrency.value;
     this.addNewRow();
     return result;
   };
@@ -107,7 +107,7 @@ export class Store {
   }
 
   get values() {
-    return this.rows.map(({ date, inflow, memo, outflow, payee, rate }) => {
+    return this.rows.map(({ date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
       const updatedMemo = `[${rate.value} * ${this.targetCurrency}] ${memo.value}`;
 
       const amount = ((Number(inflow.value) - Number(outflow.value)) * Number(rate.value)).toFixed(2);
@@ -124,7 +124,9 @@ export class Store {
     this.baseCurrency = currency;
   };
 
-  sort = () => {};
+  sort = () => {
+    throw new Error('Not implemented');
+  };
 
   reset = () => {
     this._rows = [];
@@ -140,38 +142,38 @@ export class Store {
     // this.statement = statements;
   };
 
-  importStatement = () => {
-    const statements = this.statement.map((row) => new Row(row.id, row));
+  // importStatement = () => {
+  //   const statements = this.statement.map((row) => new Row(row.id, row));
 
-    const [currentRow, ...rows] = statements;
+  //   const [currentRow, ...rows] = statements;
 
-    runInAction(() => {
-      this._rows = rows;
-      if (currentRow) {
-        this.currentRow = currentRow;
-      }
-    });
-  };
+  //   runInAction(() => {
+  //     this._rows = rows;
+  //     if (currentRow) {
+  //       this.currentRow = currentRow;
+  //     }
+  //   });
+  // };
 
-  load = () => {
-    // const { currency, statements } = this.storage.get();
-    // this.statement = statements;
-    // this.targetCurrency = currency;
-    // this.counter.set(statements.length);
-  };
+  // load = () => {
+  //   const { currency, statements } = this.storage.get();
+  //   this.statement = statements;
+  //   this.targetCurrency = currency;
+  //   this.counter.set(statements.length);
+  // };
 
-  exportCSV = () => {
-    const header = this.headers.map((item) => `"${item}"`).join(',');
-    const rows = this.values.map((row) => {
-      return Object.values(row)
-        .map((value) => `"${value}"`)
-        .join(',');
-    });
+  // exportCSV = () => {
+  //   const header = this.headers.map((item) => `"${item}"`).join(',');
+  //   const rows = this.values.map((row) => {
+  //     return Object.values(row)
+  //       .map((value) => `"${value}"`)
+  //       .join(',');
+  //   });
 
-    const fileContent = header + '\n' + rows.join('\n');
+  //   const fileContent = header + '\n' + rows.join('\n');
 
-    return new Blob([fileContent], { type: 'text/plain' });
-  };
+  //   return new Blob([fileContent], { type: 'text/plain' });
+  // };
 
   removeRow = (id: string) => {
     if (id === this.currentRow.id) {
@@ -182,4 +184,4 @@ export class Store {
   };
 }
 
-export const store = new Store();
+export const statement = new Statement();

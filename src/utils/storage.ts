@@ -1,5 +1,5 @@
+import { RowDTO } from 'src/entities/row';
 import type { Currency } from 'src/shared/types';
-import { RowValues } from 'src/store/row';
 
 class Storage<T> {
   key = 'statement';
@@ -23,7 +23,7 @@ class Storage<T> {
   }
 }
 
-export const statementStorage = new Storage<{ statements: RowValues[]; currency: Currency }>({
+export const statementStorage = new Storage<{ statements: RowDTO[]; currency: Currency }>({
   currency: 'USD',
   statements: [],
 });

@@ -2,7 +2,7 @@ import { useRef, type ChangeEvent } from 'react';
 
 import { Form, Input as AntdInput, type InputRef } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { InputType } from 'src/store/validators';
+import { InputType } from 'src/shared/utils/validators';
 
 import styles from './Input.module.scss';
 
@@ -15,7 +15,7 @@ type InputProps = {
   isValid?: boolean;
   symbol: symbol;
   type?: 'text' | 'number' | 'date';
-  inputRef: React.MutableRefObject<InputRef | null>;
+  inputRef?: React.MutableRefObject<InputRef | null>;
 };
 
 export const Input = observer((props: InputProps) => {

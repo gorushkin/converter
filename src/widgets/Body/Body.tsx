@@ -1,18 +1,12 @@
-import { useEffect } from 'react';
-
 import { Table } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { store } from 'src/store';
+import { statement } from 'src/entities/statement/model';
 
 import styles from './Body.module.scss';
 import { columns } from './columns';
 
 export const Body = observer(() => {
-  const { load, rows } = store;
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const { rows } = statement;
 
   return (
     <form className={styles.wrapper}>
