@@ -1,7 +1,6 @@
 import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { observer } from 'mobx-react-lite';
-// import { statementStore } from 'src/entities/statement/model';
 import { statementsStore } from 'src/entities/statements';
 import { LoadStatement } from 'src/features/LoadStatement';
 import { SaveStatement } from 'src/features/SaveStatement';

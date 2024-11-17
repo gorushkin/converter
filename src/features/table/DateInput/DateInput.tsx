@@ -20,7 +20,7 @@ export const DateInput = observer(({ cell }: DateInputProps) => {
 
   useEffect(() => {
     input.current?.focus();
-  }, []);
+  }, [cell.data.id]);
 
   return <Input inputRef={input} type="date" {...cell} name="date" onChange={handleChange} isValid={isValid} />;
 });
