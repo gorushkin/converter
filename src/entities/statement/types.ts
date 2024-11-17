@@ -1,15 +1,16 @@
+import type { RowDTO } from 'src/entities/row';
 import type { Currency } from 'src/shared/types';
 
 export type StatementDTO = {
-  inflow: string;
-  outflow: string;
-  rate: string;
-  memo: string;
-  payee: string;
+  name: string;
   date: string;
   id: string;
-  amountInBaseCurrency: string;
-  amountInTargetCurrency: string;
-  baseCurrency: Currency;
   targetCurrency: Currency;
+  baseCurrency: Currency;
+  row: RowDTO[];
+};
+
+export type RawStatementDTO = Omit<StatementDTO, 'date' | 'id'> & {
+  date: undefined;
+  id: undefined;
 };

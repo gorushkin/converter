@@ -1,12 +1,12 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx';
+import type { RowDTO } from 'src/entities/row';
 import { validators } from 'src/shared/utils';
 import { getCurrentDate } from 'src/utils';
 
 import { Cell } from './cell';
-import type { RowDTO } from './types';
 
 export class Row {
-  id: string;
+  id = '';
   inflow = new Cell(0);
   outflow = new Cell(0);
   amountInBaseCurrency = new Cell(0, validators.number);
@@ -15,13 +15,14 @@ export class Row {
   memo = new Cell('');
   payee = new Cell('');
   amountInTargetCurrency = new Cell(0);
-  mode: 'edit' | 'view' = 'edit';
-  inputs: symbol[] = [this.date.symbol, this.inflow.symbol, this.outflow.symbol];
+  mode: 'edit' | 'view' = 'view';
 
-  constructor(id: string, values: Partial<RowDTO> = {}) {
-    this.id = id;
-
+  constructor(values: Partial<RowDTO> = {}) {
     this.date.setValue(values.date ?? getCurrentDate());
+
+    if (values.id) {
+      this.id = values.id;
+    }
 
     if (values.inflow) {
       this.inflow.setValue(values.inflow);
@@ -82,11 +83,12 @@ export class Row {
 
   get values(): RowDTO {
     return {
+      amountInBaseCurrency: this.amountInBaseCurrency.value,
+      amountInTargetCurrency: this.amountInTargetCurrency.value,
       date: this.date.value,
       exchangeRate: this.exchangeRate.value,
       id: this.id,
       inflow: this.inflow.value,
-      isValid: this.isValid,
       memo: this.memo.value,
       outflow: this.outflow.value,
       payee: this.payee.value,
@@ -106,11 +108,11 @@ export class Row {
   };
 
   get isViewMode() {
-    return this.mode === 'view';
+    return this.mode === 'view' && !!this.id;
   }
 
   get isEditMode() {
-    return this.mode === 'edit';
+    return !this.id || this.mode === 'edit';
   }
 
   loadValues = (values: RowDTO) => {

@@ -1,21 +1,56 @@
-import type { StatementDTO } from 'src/entities/statement/';
+import { makeAutoObservable, runInAction } from 'mobx';
+import type { StatementDTO } from 'src/entities/statement';
+import { Statement } from 'src/entities/statement';
+import { getCurrentDate } from 'src/utils';
+import { statementsStorage } from 'src/utils';
+import { getId } from 'src/utils/getId';
 
 class Statements {
-  data: StatementDTO[] = [];
+  statements: StatementDTO[] = [];
 
-  saveStatement = () => {
-    throw new Error('Method not implemented.');
+  currentStatement: Statement;
+  storage = statementsStorage;
+
+  constructor() {
+    this.currentStatement = new Statement();
+
+    makeAutoObservable(this);
+  }
+
+  init = () => {
+    this.statements = this.storage.getAll();
   };
 
-  loadStatement = () => {
-    throw new Error('Method not implemented.');
+  saveStatement = () => {
+    this.storage.saveStatement(this.currentStatement.statement);
+  };
+
+  updateStatement = (statement: StatementDTO) => {
+    runInAction(() => {
+      this.statements = this.statements.map((s) => (s.id === statement.id ? statement : s));
+      this.saveStatement();
+    });
+  };
+
+  createStatement = (rawStatement: StatementDTO) => {
+    const id = String(getId());
+    const date = getCurrentDate();
+
+    runInAction(() => {
+      this.currentStatement.id = id;
+      this.currentStatement.date = date;
+      this.statements.push({ ...rawStatement, date, id });
+      this.saveStatement();
+    });
+  };
+
+  loadStatement = (id: string) => {
+    const statement = this.statements.find((s) => s.id === id);
+
+    this.currentStatement.load(statement);
   };
 
   deleteStatement = () => {
-    throw new Error('Method not implemented.');
-  };
-
-  updateStatement = () => {
     throw new Error('Method not implemented.');
   };
 
@@ -24,4 +59,4 @@ class Statements {
   };
 }
 
-export const statements = new Statements();
+export const statementsStore = new Statements();

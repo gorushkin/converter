@@ -1,24 +1,26 @@
 import { makeAutoObservable, reaction, runInAction, autorun } from 'mobx';
 import { ApiClient, Rates } from 'src/api';
-import type { RowDTO } from 'src/entities/row';
 import { Row } from 'src/entities/row';
 import { Currency } from 'src/shared/types';
-import { counter } from 'src/utils/counter';
-import { statementStorage } from 'src/utils/storage';
+import { getId } from 'src/utils/getId';
+
+import type { StatementDTO } from './types';
 
 export class Statement {
-  _rows: Row[] = [];
+  rows: Row[] = [];
   private currentRow: Row;
   targetCurrency: Currency = 'USD';
   baseCurrency: Currency = 'RUB';
   private rates: Rates = {};
-  private counter = counter();
   private apiClient = new ApiClient();
-  statement: RowDTO[] = [];
-  storage = statementStorage;
+  name = '';
+  id = '';
+  date = '';
 
-  constructor() {
-    this.currentRow = new Row(this.counter.next());
+  constructor(statement?: StatementDTO) {
+    this.currentRow = new Row();
+
+    this.load(statement);
 
     makeAutoObservable(this);
 
@@ -46,6 +48,19 @@ export class Statement {
     );
   }
 
+  load = (statement?: StatementDTO) => {
+    if (!statement) return;
+
+    runInAction(() => {
+      this.id = statement.id;
+      this.name = statement.name;
+      this.date = statement.date;
+      this.targetCurrency = statement.targetCurrency;
+      this.baseCurrency = statement.baseCurrency;
+      this.rows = statement.row.map((row) => new Row(row));
+    });
+  };
+
   private updateCurrentRate = () => {
     const rate = this.rates[this.targetCurrency] ?? 0;
 
@@ -55,10 +70,6 @@ export class Statement {
       this.currentRow.exchangeRate.setValue(rate);
     });
   };
-
-  get isStatementExist() {
-    return this.statement.length > 0;
-  }
 
   get isCurrentRowValid() {
     return this.currentRow.isValid;
@@ -82,8 +93,12 @@ export class Statement {
 
   private addNewRow = () => {
     const values = this.currentRow.values;
-    this.currentRow = new Row(this.counter.next(), { date: values.date, exchangeRate: values.exchangeRate });
+    this.currentRow = new Row({ date: values.date, exchangeRate: values.exchangeRate });
   };
+
+  get isSaved() {
+    return !!this.id;
+  }
 
   saveRow = () => {
     if (!this.currentRow.isValid) {
@@ -91,30 +106,41 @@ export class Statement {
       return;
     }
 
-    this.currentRow.close();
-    this._rows = [this.currentRow, ...this._rows];
+    this.currentRow.id = getId();
+    this.rows = [this.currentRow, ...this.rows];
     const result = this.currentRow.amountInTargetCurrency.value;
     this.addNewRow();
     return result;
   };
 
-  get rows() {
-    return [this.currentRow, ...this._rows];
+  get statement(): StatementDTO {
+    return {
+      baseCurrency: this.baseCurrency,
+      date: this.date,
+      id: this.id,
+      name: this.name,
+      row: this.rows.map((row) => row.values),
+      targetCurrency: this.targetCurrency,
+    };
   }
 
-  get headers() {
-    return ['Date', 'Payee', 'Memo', 'Amount'];
+  get data() {
+    return [this.currentRow, ...this.rows];
   }
 
-  get values() {
-    return this.rows.map(({ date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
-      const updatedMemo = `[${rate.value} * ${this.targetCurrency}] ${memo.value}`;
+  // get headers() {
+  //   return ['Date', 'Payee', 'Memo', 'Amount'];
+  // }
 
-      const amount = ((Number(inflow.value) - Number(outflow.value)) * Number(rate.value)).toFixed(2);
+  // get values() {
+  //   return this.rows.map(({ date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
+  //     const updatedMemo = `[${rate.value} * ${this.targetCurrency}] ${memo.value}`;
 
-      return [date.value, payee.value, updatedMemo, amount];
-    });
-  }
+  //     const amount = ((Number(inflow.value) - Number(outflow.value)) * Number(rate.value)).toFixed(2);
+
+  //     return [date.value, payee.value, updatedMemo, amount];
+  //   });
+  // }
 
   setTargetCurrency = (currency: Currency) => {
     this.targetCurrency = currency;
@@ -129,11 +155,8 @@ export class Statement {
   };
 
   reset = () => {
-    this._rows = [];
-    this.storage.clear();
-    this.statement = [];
-    this.counter.reset();
-    this.currentRow = new Row(this.counter.next());
+    this.rows = [];
+    this.currentRow = new Row();
   };
 
   save = () => {
@@ -176,12 +199,15 @@ export class Statement {
   // };
 
   removeRow = (id: string) => {
+    console.log('id: ', id);
     if (id === this.currentRow.id) {
       this.currentRow.reset();
     } else {
-      this._rows = this._rows.filter((row) => row.id !== id);
+      this.rows = this.rows.filter((row) => row.id !== id);
     }
   };
-}
 
-export const statement = new Statement();
+  updateName = (name: string) => {
+    this.name = name;
+  };
+}

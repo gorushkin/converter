@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { type Row } from 'src/entities/row';
-import { statement } from 'src/entities/statement';
+import { statementsStore } from 'src/entities/statements';
 
 import styles from './RowAction.module.scss';
 
@@ -9,12 +9,14 @@ type RowActionProps = {
   row: Row;
 };
 export const RowAction = observer(({ row }: RowActionProps) => {
+  const { removeRow, saveRow } = statementsStore.currentStatement;
+
   const handleRemoveClick = () => {
-    statement.removeRow(row.id);
+    removeRow(row.id);
   };
 
   const handleSaveClick = () => {
-    statement.saveRow();
+    saveRow();
   };
 
   const isButtonEnabled = row.isValid && row.isEditMode;

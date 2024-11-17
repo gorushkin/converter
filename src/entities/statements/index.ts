@@ -1,1 +1,1 @@
-export { statements } from './model';
+export { statementsStore } from './model';

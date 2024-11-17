@@ -1,21 +1,51 @@
 import type { ReactNode } from 'react';
 
-import { Modal as AntdModal } from 'antd';
-
-export type CommonModalProps = {
-  onOk: () => void;
-  onCancel: () => void;
-  isOpen: boolean;
-};
+import { Modal as AntdModal, Button } from 'antd';
 
 type ModalProps = {
   children: ReactNode;
   title: string;
-} & CommonModalProps;
+  onOk?: () => void;
+  onCancel?: () => void;
+  isOpen: boolean;
+  okButtonText?: string;
+  cancelButtonText?: string;
+  onClose?: () => void;
+};
 
-export const Modal = ({ children, isOpen, onCancel, onOk, title }: ModalProps) => {
+export const Modal = (props: ModalProps) => {
+  const { cancelButtonText, children, isOpen, okButtonText, onCancel, onOk, title } = props;
+
   return (
-    <AntdModal centered title={title} open={isOpen} onOk={onOk} onCancel={onCancel}>
+    <AntdModal
+      footer={(_, { CancelBtn, OkBtn }) => {
+        return (
+          <>
+            {!!onCancel && (
+              <>
+                {cancelButtonText && <Button>{cancelButtonText}</Button>}
+                {!cancelButtonText && <CancelBtn />}
+              </>
+            )}
+            {!!onOk && (
+              <>
+                {okButtonText && (
+                  <Button onClick={onOk} type="primary">
+                    {okButtonText}
+                  </Button>
+                )}
+                {!okButtonText && <OkBtn />}
+              </>
+            )}
+          </>
+        );
+      }}
+      centered
+      title={title}
+      open={isOpen}
+      onOk={onOk}
+      onCancel={onCancel}
+    >
       {children}
     </AntdModal>
   );

@@ -7,3 +7,5 @@ export {
 } from './formatters';
 
 export { updateClipboard } from './tools';
+
+export { statementsStorage } from './storage';

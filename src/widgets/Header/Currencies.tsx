@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { statement } from 'src/entities/statement/model';
+import { statementsStore } from 'src/entities/statements';
 import { Currency } from 'src/shared/types';
 
 import styles from './Currencies.module.scss';
@@ -8,7 +8,7 @@ import styles from './Currencies.module.scss';
 const currencies: Currency[] = ['USD', 'EUR', 'NZD', 'TRY', 'RUB', 'GEL'];
 
 export const Currencies = observer(() => {
-  const { setTargetCurrency, targetCurrency } = statement;
+  const { setTargetCurrency, targetCurrency } = statementsStore.currentStatement;
 
   return (
     <div className={styles.wrapper}>

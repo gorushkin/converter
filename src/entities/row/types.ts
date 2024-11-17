@@ -5,6 +5,7 @@ export type RowDTO = {
   payee: string;
   date: string;
   id: string;
-  isValid: boolean;
   exchangeRate: string;
+  amountInBaseCurrency: string;
+  amountInTargetCurrency: string;
 };

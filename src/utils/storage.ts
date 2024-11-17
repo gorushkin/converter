@@ -1,5 +1,4 @@
-import { RowDTO } from 'src/entities/row';
-import type { Currency } from 'src/shared/types';
+import type { StatementDTO } from 'src/entities/statement';
 
 class Storage<T> {
   key = 'statement';
@@ -23,7 +22,35 @@ class Storage<T> {
   }
 }
 
-export const statementStorage = new Storage<{ statements: RowDTO[]; currency: Currency }>({
-  currency: 'USD',
-  statements: [],
-});
+class StatementsStorage extends Storage<{ statements: StatementDTO[] }> {
+  constructor() {
+    super({ statements: [] });
+  }
+
+  getAll(): StatementDTO[] {
+    return this.get().statements;
+  }
+
+  getById(id: string): StatementDTO | undefined {
+    return this.get().statements.find((statement) => statement.id === id);
+  }
+
+  saveAll(statements: StatementDTO[]) {
+    this.set({ statements });
+  }
+
+  saveStatement(statement: StatementDTO) {
+    const statements = this.getAll();
+    const index = statements.findIndex((s) => s.id === statement.id);
+
+    if (index === -1) {
+      statements.push(statement);
+    } else {
+      statements[index] = statement;
+    }
+
+    this.saveAll(statements);
+  }
+}
+
+export const statementsStorage = new StatementsStorage();

@@ -1,15 +1,16 @@
 import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { observer } from 'mobx-react-lite';
-import { statement } from 'src/entities/statement/model';
-import { statements } from 'src/entities/statements';
+// import { statementStore } from 'src/entities/statement/model';
+import { statementsStore } from 'src/entities/statements';
+import { LoadStatement } from 'src/features/LoadStatement';
 import { SaveStatement } from 'src/features/SaveStatement';
 import { useModal } from 'src/shared/hooks/useModal';
 
 import styles from './Actions.module.scss';
 export const Actions = observer(() => {
-  const { isStatementExist, reset, sort } = statement;
-  const { exportCSV, loadStatement } = statements;
+  const { currentStatement, exportCSV, updateStatement } = statementsStore;
+  const { isSaved, reset, sort, statement } = currentStatement;
 
   const handleExport = () => {
     const blob = exportCSV();
@@ -25,18 +26,27 @@ export const Actions = observer(() => {
     URL.revokeObjectURL(url);
   };
 
-  const [isSaveModalOpen, openSaveModal, closeSaveModal] = useModal();
+  const saveModal = useModal();
+  const loadModal = useModal();
+
+  const handleSaveClick = () => {
+    if (isSaved) {
+      updateStatement(statement);
+    } else {
+      saveModal.open();
+    }
+  };
 
   return (
     <div className={styles.wrapper}>
       <Button onClick={sort} type="primary">
         Sort by date
       </Button>
-      <Button onClick={openSaveModal} type="primary">
+      <Button onClick={handleSaveClick} type="primary">
         Save
       </Button>
-      <Button disabled={!isStatementExist} onClick={loadStatement} type="primary">
-        Import
+      <Button disabled={statementsStore.statements.length === 0} onClick={loadModal.open} type="primary">
+        Load
       </Button>
       <Button onClick={reset} type="primary">
         Reset all
@@ -44,7 +54,8 @@ export const Actions = observer(() => {
       <Button onClick={handleExport} type="primary">
         Export
       </Button>
-      <SaveStatement isOpen={isSaveModalOpen} onClose={closeSaveModal} />
+      <SaveStatement isOpen={saveModal.isOpen} onClose={saveModal.close} />
+      <LoadStatement isOpen={loadModal.isOpen} onClose={loadModal.close} />
     </div>
   );
 });

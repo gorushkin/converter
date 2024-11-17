@@ -10,7 +10,7 @@ export const columns: ColumnsType<Row> = [
   {
     dataIndex: 'id',
     key: 'id',
-    render: (id: string) => id,
+    render: (_id, _row, index) => index + 1,
     title: '#',
   },
   {
