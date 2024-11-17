@@ -1,5 +1,6 @@
-import { makeAutoObservable, reaction, runInAction } from 'mobx';
+import { autorun, makeAutoObservable, reaction, runInAction } from 'mobx';
 import type { RowDTO } from 'src/entities/row';
+import type { RateUpdater } from 'src/entities/statement';
 import { validators } from 'src/shared/utils';
 import { getCurrentDate } from 'src/utils';
 
@@ -17,32 +18,12 @@ export class Row {
   amountInTargetCurrency = new Cell(0);
   mode: 'edit' | 'view' = 'view';
 
-  constructor(values: Partial<RowDTO> = {}) {
-    this.date.setValue(values.date ?? getCurrentDate());
+  updater: RateUpdater;
 
-    if (values.id) {
-      this.id = values.id;
-    }
+  constructor(updater: RateUpdater, values: Partial<RowDTO> = {}) {
+    this.updater = updater;
 
-    if (values.inflow) {
-      this.inflow.setValue(values.inflow);
-    }
-
-    if (values.outflow) {
-      this.outflow.setValue(values.outflow);
-    }
-
-    if (values.exchangeRate) {
-      this.exchangeRate.setValue(values.exchangeRate);
-    }
-
-    if (values.memo) {
-      this.memo.setValue(values.memo);
-    }
-
-    if (values.payee) {
-      this.payee.setValue(values.payee);
-    }
+    this.setValues(values);
 
     makeAutoObservable(this);
 
@@ -50,6 +31,16 @@ export class Row {
       () => [this.inflow.value, this.outflow.value],
       () => {
         this.amountInBaseCurrency.setValue(Number(this.inflow.value) - Number(this.outflow.value));
+      }
+    );
+
+    reaction(
+      () => [this.amountInBaseCurrency.data, this.exchangeRate.data] as const,
+      ([amount, rate]) => {
+        if (rate.isValid) {
+          const result = Number(amount.value) * Number(rate.value);
+          this.amountInTargetCurrency.setValue(String(result));
+        }
       }
     );
 
@@ -66,7 +57,40 @@ export class Row {
         this.inflow.setValue(0);
       }
     );
+
+    autorun(() => {
+      if (!this.date.isValid) return;
+
+      void this.updateRate();
+    });
   }
+
+  setValues = (values: Partial<RowDTO> = {}) => {
+    runInAction(() => {
+      this.date.setValue(values.date ?? getCurrentDate());
+      this.inflow.setValue(values.inflow ?? 0);
+      this.outflow.setValue(values.outflow ?? 0);
+      this.amountInBaseCurrency.setValue(values.amountInBaseCurrency ?? 0);
+      this.exchangeRate.setValue(values.exchangeRate ?? 0);
+      this.memo.setValue(values.memo ?? '');
+      this.payee.setValue(values.payee ?? '');
+      this.id = values.id ?? '';
+
+      if (values.id) {
+        this.mode = 'view';
+      }
+    });
+  };
+
+  updateRate = async () => {
+    const rate = await this.updater(this.date.value);
+
+    if (!rate) return;
+
+    runInAction(() => {
+      this.exchangeRate.setValue(rate);
+    });
+  };
 
   reset = () => {
     runInAction(() => {
@@ -103,17 +127,25 @@ export class Row {
     this.mode = 'view';
   };
 
-  edit = () => {
+  open = () => {
     this.mode = 'edit';
   };
 
-  get isViewMode() {
-    return this.mode === 'view' && !!this.id;
+  get isClosed() {
+    return this.mode === 'view' && this.isSaved;
   }
 
-  get isEditMode() {
-    return !this.id || this.mode === 'edit';
+  get isOpen() {
+    return this.mode === 'edit' || !this.isSaved;
   }
+
+  get isSaved() {
+    return !!this.id;
+  }
+
+  toggleMode = () => {
+    this.mode = this.mode === 'view' ? 'edit' : 'view';
+  };
 
   loadValues = (values: RowDTO) => {
     runInAction(() => {

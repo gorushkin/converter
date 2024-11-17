@@ -1,52 +1,41 @@
-import { makeAutoObservable, reaction, runInAction, autorun } from 'mobx';
-import { ApiClient, Rates } from 'src/api';
-import { Row } from 'src/entities/row';
+import { makeAutoObservable, runInAction } from 'mobx';
+import { ApiClient } from 'src/api';
+import { Row, type RowDTO } from 'src/entities/row';
 import { Currency } from 'src/shared/types';
 import { getId } from 'src/utils/getId';
 
-import type { StatementDTO } from './types';
+import type { RateUpdater, StatementDTO } from './types';
 
 export class Statement {
   rows: Row[] = [];
   private currentRow: Row;
   targetCurrency: Currency = 'USD';
   baseCurrency: Currency = 'RUB';
-  private rates: Rates = {};
   private apiClient = new ApiClient();
   name = '';
   id = '';
   date = '';
 
   constructor(statement?: StatementDTO) {
-    this.currentRow = new Row();
+    this.currentRow = new Row(this.rateUpdater);
 
     this.load(statement);
 
     makeAutoObservable(this);
-
-    autorun(() => {
-      if (!this.currentRow.date.isValid) return;
-
-      void this.updateRate();
-    });
-
-    reaction(
-      () => [this.currentRow.amountInBaseCurrency.data, this.currentRow.exchangeRate.data] as const,
-      ([amount, rate]) => {
-        if (rate.isValid) {
-          const result = Number(amount.value) * Number(rate.value);
-          this.currentRow.amountInTargetCurrency.setValue(String(result));
-        }
-      }
-    );
-
-    reaction(
-      () => this.targetCurrency,
-      () => {
-        this.updateCurrentRate();
-      }
-    );
   }
+
+  private rateUpdater: RateUpdater = async (date) => {
+    const result = await this.apiClient.fetchCurrencyRate(date);
+
+    if (!result.ok) {
+      console.error('Something went wrong');
+      return null;
+    }
+
+    const rates = result.data.rates;
+
+    return rates[this.targetCurrency] ?? 0;
+  };
 
   load = (statement?: StatementDTO) => {
     if (!statement) return;
@@ -57,17 +46,7 @@ export class Statement {
       this.date = statement.date;
       this.targetCurrency = statement.targetCurrency;
       this.baseCurrency = statement.baseCurrency;
-      this.rows = statement.row.map((row) => new Row(row));
-    });
-  };
-
-  private updateCurrentRate = () => {
-    const rate = this.rates[this.targetCurrency] ?? 0;
-
-    if (!this.currentRow.date.isValid) return;
-
-    runInAction(() => {
-      this.currentRow.exchangeRate.setValue(rate);
+      this.rows = statement.row.map((row) => new Row(this.rateUpdater, row));
     });
   };
 
@@ -75,32 +54,30 @@ export class Statement {
     return this.currentRow.isValid;
   }
 
-  private updateRate = async () => {
-    const result = await this.apiClient.fetchCurrencyRate(this.currentRow.date.value);
-
-    if (!result.ok) {
-      console.error('Something went wrong');
-      return;
-    }
-
-    const rates = result.data.rates;
-
-    runInAction(() => {
-      this.rates = rates;
-      this.updateCurrentRate();
-    });
-  };
-
   private addNewRow = () => {
     const values = this.currentRow.values;
-    this.currentRow = new Row({ date: values.date, exchangeRate: values.exchangeRate });
+    this.currentRow = new Row(this.rateUpdater, { date: values.date, exchangeRate: values.exchangeRate });
   };
 
   get isSaved() {
     return !!this.id;
   }
 
-  saveRow = () => {
+  updateRow = (id: string, values: Partial<RowDTO>) => {
+    const row = this.rows.find((row) => row.id === id);
+
+    if (!row) {
+      console.error('Row not found');
+      return;
+    }
+
+    runInAction(() => {
+      row.setValues(values);
+      row.close();
+    });
+  };
+
+  createRow = () => {
     if (!this.currentRow.isValid) {
       console.error('Row is not valid');
       return;
@@ -156,34 +133,8 @@ export class Statement {
 
   reset = () => {
     this.rows = [];
-    this.currentRow = new Row();
+    this.currentRow = new Row(this.rateUpdater);
   };
-
-  save = () => {
-    // const statements = [this.currentRow, ...this._rows].map((row) => row.values);
-    // this.storage.set({ currency: this.targetCurrency, statements });
-    // this.statement = statements;
-  };
-
-  // importStatement = () => {
-  //   const statements = this.statement.map((row) => new Row(row.id, row));
-
-  //   const [currentRow, ...rows] = statements;
-
-  //   runInAction(() => {
-  //     this._rows = rows;
-  //     if (currentRow) {
-  //       this.currentRow = currentRow;
-  //     }
-  //   });
-  // };
-
-  // load = () => {
-  //   const { currency, statements } = this.storage.get();
-  //   this.statement = statements;
-  //   this.targetCurrency = currency;
-  //   this.counter.set(statements.length);
-  // };
 
   // exportCSV = () => {
   //   const header = this.headers.map((item) => `"${item}"`).join(',');

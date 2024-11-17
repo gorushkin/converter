@@ -14,3 +14,5 @@ export type RawStatementDTO = Omit<StatementDTO, 'date' | 'id'> & {
   date: undefined;
   id: undefined;
 };
+
+export type RateUpdater = (date: string) => Promise<number | null>;

@@ -1,6 +1,7 @@
 import { ColumnsType } from 'antd/es/table';
 import type { Cell, Row } from 'src/entities/row';
 import { AmountInput } from 'src/features/table/AmountInput';
+import { CellWrapper } from 'src/features/table/CellWrapper';
 import { DateInput } from 'src/features/table/DateInput';
 import { RenderCurrencyCell } from 'src/features/table/RenderCurrencyCell';
 import { RenderTextCell } from 'src/features/table/RenderTextCell';
@@ -17,7 +18,7 @@ export const columns: ColumnsType<Row> = [
     dataIndex: 'date',
     key: 'date',
     render: (cell: Cell<string>, row: Row) => {
-      return row.isViewMode ? <RenderTextCell cell={cell} /> : <DateInput cell={cell} />;
+      return <CellWrapper cell={cell} closed={RenderTextCell} open={DateInput} row={row} />;
     },
     title: 'Date',
   },
@@ -25,7 +26,7 @@ export const columns: ColumnsType<Row> = [
     dataIndex: 'outflow',
     key: 'outflow',
     render: (cell: Cell<number>, row: Row) => {
-      return row.isViewMode ? <RenderCurrencyCell cell={cell} /> : <AmountInput cell={cell} />;
+      return <CellWrapper cell={cell} closed={RenderCurrencyCell} open={AmountInput} row={row} />;
     },
     title: 'Outflow',
   },
@@ -33,7 +34,7 @@ export const columns: ColumnsType<Row> = [
     dataIndex: 'inflow',
     key: 'inflow',
     render: (cell: Cell<number>, row: Row) => {
-      return row.isViewMode ? <RenderCurrencyCell cell={cell} /> : <AmountInput cell={cell} />;
+      return <CellWrapper cell={cell} closed={RenderCurrencyCell} open={AmountInput} row={row} />;
     },
     title: 'Inflow',
   },
@@ -49,7 +50,7 @@ export const columns: ColumnsType<Row> = [
     dataIndex: 'memo',
     key: 'memo',
     render: (cell: Cell<string>, row: Row) => {
-      return row.isViewMode ? <RenderTextCell cell={cell} /> : <AmountInput cell={cell} />;
+      return <CellWrapper cell={cell} closed={RenderTextCell} open={AmountInput} row={row} />;
     },
     title: 'Memo',
   },
@@ -62,9 +63,7 @@ export const columns: ColumnsType<Row> = [
   {
     dataIndex: 'amountInTargetCurrency',
     key: 'amountInTargetCurrency',
-    render: (cell: Cell<number>) => {
-      return <RenderCurrencyCell cell={cell} />;
-    },
+    render: (cell: Cell<number>) => <RenderCurrencyCell cell={cell} />,
     title: 'Target amount',
   },
   {
