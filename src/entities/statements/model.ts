@@ -1,15 +1,15 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import type { StatementDTO } from 'src/entities/statement';
 import { Statement } from 'src/entities/statement';
-import { getCurrentDate } from 'src/utils';
-import { statementsStorage } from 'src/utils';
+import { getCurrentDate, statementsStorage } from 'src/utils';
 import { getId } from 'src/utils/getId';
+import type { StatementsStorage } from 'src/utils/storage';
 
 class Statements {
   statements: StatementDTO[] = [];
 
   currentStatement: Statement;
-  storage = statementsStorage;
+  storage: StatementsStorage = statementsStorage;
 
   constructor() {
     this.currentStatement = new Statement();

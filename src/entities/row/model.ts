@@ -1,4 +1,4 @@
-import { autorun, makeAutoObservable, reaction, runInAction } from 'mobx';
+import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import type { RowDTO } from 'src/entities/row';
 import type { RateUpdater } from 'src/entities/statement';
 import { validators } from 'src/shared/utils';
@@ -58,11 +58,14 @@ export class Row {
       }
     );
 
-    autorun(() => {
-      if (!this.date.isValid) return;
+    reaction(
+      () => JSON.stringify(this.date.value),
+      (a, b) => {
+        if (!this.date.isValid) return;
 
-      void this.updateRate();
-    });
+        void this.updateRate();
+      }
+    );
   }
 
   setValues = (values: Partial<RowDTO> = {}) => {
@@ -71,6 +74,7 @@ export class Row {
       this.inflow.setValue(values.inflow ?? 0);
       this.outflow.setValue(values.outflow ?? 0);
       this.amountInBaseCurrency.setValue(values.amountInBaseCurrency ?? 0);
+      this.amountInTargetCurrency.setValue(values.amountInTargetCurrency ?? 0);
       this.exchangeRate.setValue(values.exchangeRate ?? 0);
       this.memo.setValue(values.memo ?? '');
       this.payee.setValue(values.payee ?? '');

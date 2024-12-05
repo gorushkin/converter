@@ -8,7 +8,7 @@ import type { RateUpdater, StatementDTO } from './types';
 
 export class Statement {
   rows: Row[] = [];
-  private currentRow: Row;
+  currentRow: Row;
   targetCurrency: Currency = 'USD';
   baseCurrency: Currency = 'RUB';
   private apiClient = new ApiClient();
@@ -150,7 +150,6 @@ export class Statement {
   // };
 
   removeRow = (id: string) => {
-    console.log('id: ', id);
     if (id === this.currentRow.id) {
       this.currentRow.reset();
     } else {

@@ -22,7 +22,7 @@ class Storage<T> {
   }
 }
 
-class StatementsStorage extends Storage<{ statements: StatementDTO[] }> {
+export class StatementsStorage extends Storage<{ statements: StatementDTO[] }> {
   constructor() {
     super({ statements: [] });
   }
