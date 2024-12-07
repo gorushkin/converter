@@ -16,10 +16,12 @@ export class ApiClient {
   private url = `${BASE_URL}cbrf?date=`;
 
   fetchCurrencyRate = async (date: string): Promise<Response<RatesInfo>> => {
+    const url = `${this.url}${date}`;
     try {
-      const { data } = await axios<RatesInfo>(`${this.url}${date}`);
+      const { data } = await axios<RatesInfo>(url);
       return { data, ok: true };
     } catch (error) {
+      console.error('Error fetching CBRF rate', url);
       console.error('Error fetching CBRF rate', error);
       return { error: 'Something went wrong', ok: false };
     }

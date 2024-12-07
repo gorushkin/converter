@@ -1,0 +1,1 @@
+export { statementsStore } from './model';

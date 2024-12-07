@@ -1,0 +1,19 @@
+.wrapper {
+  padding: 0 16px;
+  flex-grow: 1;
+}
+
+.buttonsWrapper {
+  display: flex;
+  column-gap: 16px;
+}
+
+.logWrapper {
+  overflow-y: auto;
+  min-height: 300px;
+  display: flex;
+}
+
+.log {
+  width: 50%;
+}
