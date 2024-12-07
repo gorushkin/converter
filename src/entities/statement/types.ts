@@ -1,4 +1,4 @@
-import type { RowDTO } from 'src/entities/row';
+import type { Row, RowDTO } from 'src/entities/row';
 import type { Currency } from 'src/shared/types';
 
 export type StatementDTO = {
@@ -16,3 +16,14 @@ export type RawStatementDTO = Omit<StatementDTO, 'date' | 'id'> & {
 };
 
 export type RateUpdater = (date: string) => Promise<number | null>;
+
+export type TotalRow = {
+  amount: number;
+  amountInTargetCurrency: number;
+  inflow: number;
+  outflow: number;
+  id: string;
+  type: 'total';
+};
+
+export type TableRow = Row | TotalRow;

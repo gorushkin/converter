@@ -55,7 +55,7 @@ class Statements {
   };
 
   exportCSV = (): Blob => {
-    throw new Error('Method not implemented.');
+    return this.currentStatement.getCSV();
   };
 }
 

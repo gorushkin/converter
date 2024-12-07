@@ -1,2 +1,2 @@
 export { Statement } from './model';
-export type { StatementDTO, RawStatementDTO, RateUpdater } from './types';
+export type { StatementDTO, RawStatementDTO, RateUpdater, TotalRow, TableRow } from './types';

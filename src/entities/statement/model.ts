@@ -4,7 +4,7 @@ import { Row, type RowDTO } from 'src/entities/row';
 import { Currency } from 'src/shared/types';
 import { getId } from 'src/utils/getId';
 
-import type { RateUpdater, StatementDTO } from './types';
+import type { RateUpdater, StatementDTO, TotalRow } from './types';
 
 export class Statement {
   rows: Row[] = [];
@@ -102,22 +102,26 @@ export class Statement {
   }
 
   get data() {
-    return [this.currentRow, ...this.rows];
+    const total = this.rows.reduce<TotalRow>(
+      (acc, row) => ({
+        amount: acc.amount + Number(row.inflow.value) - Number(row.outflow.value),
+        amountInTargetCurrency: acc.amountInTargetCurrency + Number(row.amountInTargetCurrency.value),
+        id: 'total',
+        inflow: acc.inflow + Number(row.inflow.value),
+        outflow: acc.outflow + Number(row.outflow.value),
+        type: acc.type,
+      }),
+      {
+        amount: 0,
+        amountInTargetCurrency: 0,
+        id: 'total',
+        inflow: 0,
+        outflow: 0,
+        type: 'total',
+      }
+    );
+    return [this.currentRow, ...this.rows, total];
   }
-
-  // get headers() {
-  //   return ['Date', 'Payee', 'Memo', 'Amount'];
-  // }
-
-  // get values() {
-  //   return this.rows.map(({ date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
-  //     const updatedMemo = `[${rate.value} * ${this.targetCurrency}] ${memo.value}`;
-
-  //     const amount = ((Number(inflow.value) - Number(outflow.value)) * Number(rate.value)).toFixed(2);
-
-  //     return [date.value, payee.value, updatedMemo, amount];
-  //   });
-  // }
 
   setTargetCurrency = (currency: Currency) => {
     this.targetCurrency = currency;
@@ -136,18 +140,34 @@ export class Statement {
     this.currentRow = new Row(this.rateUpdater);
   };
 
-  // exportCSV = () => {
-  //   const header = this.headers.map((item) => `"${item}"`).join(',');
-  //   const rows = this.values.map((row) => {
-  //     return Object.values(row)
-  //       .map((value) => `"${value}"`)
-  //       .join(',');
-  //   });
+  getCSV = () => {
+    const headers = ['Date', 'Payee', 'Memo', 'Outflow', 'Inflow'];
 
-  //   const fileContent = header + '\n' + rows.join('\n');
+    const getValues = (rows: Row[]) => {
+      return rows.map(({ date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
+        const updatedMemo = `[${rate.value} * ${this.targetCurrency}] ${memo.value}`;
 
-  //   return new Blob([fileContent], { type: 'text/plain' });
-  // };
+        const updatedInflow = (Number(inflow.value) * Number(rate.value)).toFixed(2);
+        const updatedOutflow = (Number(outflow.value) * Number(rate.value)).toFixed(2);
+
+        return [date.value, payee.value, updatedMemo, updatedOutflow, updatedInflow];
+      });
+    };
+
+    const header = headers.map((item) => `"${item}"`).join(',');
+
+    const values = getValues(this.rows);
+
+    const rows = values.map((row) => {
+      return Object.values(row)
+        .map((value) => `"${value}"`)
+        .join(',');
+    });
+
+    const fileContent = header + '\n' + rows.join('\n');
+
+    return new Blob([fileContent], { type: 'text/plain' });
+  };
 
   removeRow = (id: string) => {
     if (id === this.currentRow.id) {
