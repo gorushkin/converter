@@ -2,11 +2,13 @@ import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { observer } from 'mobx-react-lite';
 import { statementsStore } from 'src/entities/statements';
+import { ImportStatement } from 'src/features/ImportStatement';
 import { LoadStatement } from 'src/features/LoadStatement';
 import { SaveStatement } from 'src/features/SaveStatement';
 import { useModal } from 'src/shared/hooks/useModal';
 
 import styles from './Actions.module.scss';
+
 export const Actions = observer(() => {
   const { currentStatement, exportCSV, updateStatement } = statementsStore;
   const { isSaved, reset, sort, statement } = currentStatement;
@@ -53,6 +55,7 @@ export const Actions = observer(() => {
       <Button onClick={handleExport} type="primary">
         Export
       </Button>
+      <ImportStatement />
       <SaveStatement isOpen={saveModal.isOpen} onClose={saveModal.close} />
       <LoadStatement isOpen={loadModal.isOpen} onClose={loadModal.close} />
     </div>

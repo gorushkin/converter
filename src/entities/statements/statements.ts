@@ -57,6 +57,10 @@ class Statements {
   exportCSV = (): Blob => {
     return this.currentStatement.getCSV();
   };
+
+  importStatement = (statement: StatementDTO) => {
+    this.currentStatement.load(statement);
+  };
 }
 
 export const statementsStore = new Statements();

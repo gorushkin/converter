@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { ApiClient } from 'src/api';
 import { Row, type RowDTO } from 'src/entities/row';
-import { Currency } from 'src/shared/types';
+import { columns, Currency } from 'src/shared/types';
 import { getId } from 'src/utils/getId';
 
 import type { RateUpdater, StatementDTO, TotalRow } from './types';
@@ -141,7 +141,7 @@ export class Statement {
   };
 
   getCSV = () => {
-    const headers = ['Date', 'Payee', 'Memo', 'Outflow', 'Inflow'];
+    const headers = columns;
 
     const getValues = (rows: Row[]) => {
       return rows.map(({ date, exchangeRate: rate, inflow, memo, outflow, payee }) => {

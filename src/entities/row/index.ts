@@ -1,3 +1,3 @@
-export { Row } from './model';
+export { Row } from './row';
 export { Cell } from './cell';
 export type { RowDTO } from './types';

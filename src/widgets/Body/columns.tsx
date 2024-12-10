@@ -8,12 +8,17 @@ import { DateInput } from 'src/features/table/DateInput';
 import { RenderCurrencyCell } from 'src/features/table/RenderCurrencyCell';
 import { RenderTextCell } from 'src/features/table/RenderTextCell';
 import { RowAction } from 'src/features/table/RowAction';
+import { checkIsTotal } from 'src/shared/utils/validators';
 
 export const columns: ColumnsType<TableRow> = [
   {
     dataIndex: 'id',
     key: 'id',
-    render: (_id, _row, index) => index + 1,
+    render: (_id, row, index) => {
+      const isTotalRow = checkIsTotal(row);
+
+      return isTotalRow ? 'Total' : index + 1;
+    },
     title: '#',
   },
   {

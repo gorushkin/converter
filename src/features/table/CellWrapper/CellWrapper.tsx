@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import type { Cell, Row } from 'src/entities/row';
 import type { TableRow, TotalRow } from 'src/entities/statement/';
+import { RenderCell } from 'src/shared/ui/Cell';
+import { checkIsTotal } from 'src/shared/utils/validators';
 import { numberToCopyCurrency } from 'src/utils';
 
 type CellWrapperProps<T> = {
@@ -26,19 +28,15 @@ type BaseCellWrapperProps = {
   children: (row: Row) => React.ReactNode;
 };
 
-const checkIsTotal = (row: TableRow): row is TotalRow => {
-  return 'type' in row && row.type === 'total';
-};
-
 export const BaseCellWrapper = observer(({ children, property, row }: BaseCellWrapperProps) => {
   const isTotal = checkIsTotal(row);
 
   if (isTotal) {
     const value = row[property!];
     const convertedValue = numberToCopyCurrency(String(value));
-    const valueToRender = value ? convertedValue : '';
+    const valueToRender = property ? convertedValue : '';
 
-    return <span>{valueToRender}</span>;
+    return <RenderCell value={valueToRender} toCopyValue={valueToRender} />;
   }
 
   return children(row);

@@ -1,3 +1,4 @@
+import type { TableRow, TotalRow } from 'src/entities/statement';
 import { validateUserDate } from 'src/utils';
 
 export type InputType = 'date' | 'amount' | 'memo';
@@ -13,4 +14,8 @@ export const numberValidator = (amount: string) => {
 export const validators = {
   date: dateValidator,
   number: numberValidator,
+};
+
+export const checkIsTotal = (row: TableRow): row is TotalRow => {
+  return 'type' in row && row.type === 'total';
 };
