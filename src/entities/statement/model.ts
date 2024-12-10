@@ -144,8 +144,9 @@ export class Statement {
     const headers = ['Date', 'Payee', 'Memo', 'Outflow', 'Inflow'];
 
     const getValues = (rows: Row[]) => {
-      return rows.map(({ date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
-        const updatedMemo = `[${rate.value} * ${this.targetCurrency}] ${memo.value}`;
+      return rows.map(({ amountInBaseCurrency, date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
+        const amount = Math.abs(Number(amountInBaseCurrency.value));
+        const updatedMemo = `(${amount} ${this.targetCurrency} * ${rate.value}) ${memo.value}`;
 
         const updatedInflow = (Number(inflow.value) * Number(rate.value)).toFixed(2);
         const updatedOutflow = (Number(outflow.value) * Number(rate.value)).toFixed(2);
