@@ -180,4 +180,14 @@ export class Statement {
   get balance(): Balance {
     return { endBalance: this.endBalance, startBalance: this.startBalance };
   }
+
+  updateRate = async () => {
+    const rate = await this.rateUpdater(this.currentRow.date.value);
+
+    if (!rate) return;
+
+    runInAction(() => {
+      this.currentRow.exchangeRate.setValue(rate);
+    });
+  };
 }

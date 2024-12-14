@@ -4,6 +4,7 @@ import type { TableRow } from 'src/entities/statement';
 import { AmountInput } from 'src/features/Statement/AmountInput';
 import { CellWrapper } from 'src/features/Statement/CellWrapper';
 import { DateInput } from 'src/features/Statement/DateInput';
+import { RateInput } from 'src/features/Statement/RateInput';
 import { RenderCurrencyCell } from 'src/features/Statement/RenderCurrencyCell';
 import { RenderTextCell } from 'src/features/Statement/RenderTextCell';
 import { RowAction } from 'src/features/Statement/RowAction';
@@ -54,7 +55,7 @@ export const columns: ColumnsType<TableRow> = [
   {
     dataIndex: 'exchangeRate',
     key: 'exchangeRate',
-    render: (cell: Cell<number>) => <RenderCurrencyCell cell={cell} />,
+    render: (cell: Cell<number>) => <RateInput cell={cell} />,
     title: 'Rate',
   },
   {
