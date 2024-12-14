@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import type { Cell } from 'src/entities/row';
 import { statementsStore } from 'src/entities/statements';
+import { AmountInput } from 'src/features/Statement/AmountInput';
 import { RenderCurrencyCell } from 'src/features/Statement/RenderCurrencyCell';
 import { ActionButton } from 'src/shared/ui/ActionButton';
-import { AmountInput } from 'src/shared/ui/AmountInput';
 
 import styles from './RateInput.module.scss';
 
