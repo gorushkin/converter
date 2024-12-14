@@ -13,8 +13,6 @@ export const columns = [Column.DATE, Column.PAYEE, Column.MEMO, Column.OUTFLOW, 
 export type ImportTransactionDTO = {
   date: string;
   memo: string;
-  // inflow: string;
-  // outflow: string;
   payee: string;
   amount: number;
 };
@@ -24,3 +22,13 @@ export enum Bank {
   TBC = 'tbc',
   VAKIF = 'vakif',
 }
+
+const bankNameMap = {
+  [Bank.BOG]: 'BOG',
+  [Bank.TBC]: 'TBC',
+  [Bank.VAKIF]: 'Vakif',
+};
+
+export const getBankName = (bank: Bank): string => {
+  return bankNameMap[bank];
+};

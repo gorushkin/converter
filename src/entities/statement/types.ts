@@ -8,6 +8,8 @@ export type StatementDTO = {
   targetCurrency: Currency;
   baseCurrency: Currency;
   row: RowDTO[];
+  startBalance: number;
+  endBalance: number;
 };
 
 export type RawStatementDTO = Omit<StatementDTO, 'date' | 'id'> & {

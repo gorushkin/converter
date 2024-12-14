@@ -39,6 +39,7 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'no-console': ['error', { allow: ['error'] }],
       'unused-imports/no-unused-imports': 'error',
       '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
       'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],

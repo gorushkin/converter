@@ -5,6 +5,7 @@ dayjs.extend(customParseFormat);
 
 const BASE_DATE_FORMAT = 'YYYY-MM-DD';
 const BOG_DATE_FORMAT = 'DD/MM/YYYY';
+const VAKIF_DATE_FORMAT = 'DD.MM.YYYY HH:mm';
 
 export const getCurrentDate = (): string => dayjs().format(BASE_DATE_FORMAT);
 
@@ -26,3 +27,6 @@ export const numberToUICurrency = (number: number) =>
 export const numberToCopyCurrency = (number: string) => number.replace('.', ',');
 
 export const convertBogToBaseDate = formatDate(BOG_DATE_FORMAT)(BASE_DATE_FORMAT);
+export const convertVakifToBaseDate = formatDate(VAKIF_DATE_FORMAT)(BASE_DATE_FORMAT);
+
+export const getISODate = (date?: string) => dayjs(date).toISOString();
