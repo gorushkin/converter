@@ -1,10 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { ApiClient } from 'src/api';
 import { Row, type RowDTO } from 'src/entities/row';
-import { columns, Currency } from 'src/shared/types';
+import { columns, Currency, type Balance } from 'src/shared/types';
 import { getId } from 'src/utils/getId';
 
-import type { RateUpdater, StatementDTO, TotalRow } from './types';
+import type { RateUpdater, StatementDTO } from './types';
 
 export class Statement {
   rows: Row[] = [];
@@ -15,6 +15,10 @@ export class Statement {
   name = '';
   id = '';
   date = '';
+  startBalance = 0;
+  endBalance = 0;
+  inflow = 0;
+  outflow = 0;
 
   constructor(statement?: StatementDTO) {
     this.currentRow = new Row(this.rateUpdater);
@@ -46,6 +50,10 @@ export class Statement {
       this.date = statement.date;
       this.targetCurrency = statement.targetCurrency;
       this.baseCurrency = statement.baseCurrency;
+      this.startBalance = statement.startBalance;
+      this.endBalance = statement.endBalance;
+      this.inflow = statement.inflow;
+      this.outflow = statement.outflow;
       this.rows = statement.row.map((row) => new Row(this.rateUpdater, row));
     });
   };
@@ -94,33 +102,19 @@ export class Statement {
     return {
       baseCurrency: this.baseCurrency,
       date: this.date,
+      endBalance: this.endBalance,
       id: this.id,
+      inflow: this.inflow,
       name: this.name,
+      outflow: this.outflow,
       row: this.rows.map((row) => row.values),
+      startBalance: this.startBalance,
       targetCurrency: this.targetCurrency,
     };
   }
 
   get data() {
-    const total = this.rows.reduce<TotalRow>(
-      (acc, row) => ({
-        amount: acc.amount + Number(row.inflow.value) - Number(row.outflow.value),
-        amountInTargetCurrency: acc.amountInTargetCurrency + Number(row.amountInTargetCurrency.value),
-        id: 'total',
-        inflow: acc.inflow + Number(row.inflow.value),
-        outflow: acc.outflow + Number(row.outflow.value),
-        type: acc.type,
-      }),
-      {
-        amount: 0,
-        amountInTargetCurrency: 0,
-        id: 'total',
-        inflow: 0,
-        outflow: 0,
-        type: 'total',
-      }
-    );
-    return [this.currentRow, ...this.rows, total];
+    return [this.currentRow, ...this.rows];
   }
 
   setTargetCurrency = (currency: Currency) => {
@@ -138,6 +132,7 @@ export class Statement {
   reset = () => {
     this.rows = [];
     this.currentRow = new Row(this.rateUpdater);
+    this.name = '';
   };
 
   getCSV = () => {
@@ -181,4 +176,8 @@ export class Statement {
   updateName = (name: string) => {
     this.name = name;
   };
+
+  get balance(): Balance {
+    return { endBalance: this.endBalance, startBalance: this.startBalance };
+  }
 }

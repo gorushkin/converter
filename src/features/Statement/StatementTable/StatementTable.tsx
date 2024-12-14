@@ -1,12 +1,11 @@
 import { Table } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { statementsStore } from 'src/entities/statements';
-import { TableLog } from 'src/features/table/TableLog';
 
-import styles from './Body.module.scss';
 import { columns } from './columns';
+import styles from './StatementTable.module.scss';
 
-export const Body = observer(() => {
+export const StatementTable = observer(() => {
   const { currentStatement } = statementsStore;
 
   const { data } = currentStatement;
@@ -14,7 +13,6 @@ export const Body = observer(() => {
   return (
     <form className={styles.wrapper}>
       <Table rowKey={'id'} dataSource={data} columns={columns} pagination={false} />
-      <TableLog />
     </form>
   );
 });

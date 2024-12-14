@@ -1,14 +1,9 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
-import { Bank, getBankName, ImportTransactionDTO, type Currency } from 'src/shared/types';
+import { Bank, getBankName, ImportTransactionDTO, type Balance, type Currency } from 'src/shared/types';
 import * as XLSX from 'xlsx';
 
 import { convertVakifToBaseDate, getISODate } from './formatters';
-
-type Balance = {
-  startBalance: number;
-  endBalance: number;
-};
 
 type VakifTransactionDTO = {
   'ACCOUNT NUMBER': string;
@@ -29,14 +24,13 @@ type VakifTransactionDTO = {
 };
 
 class VakifParser {
-  rawData: ArrayBuffer | null = null;
-  bank: Bank = Bank.VAKIF;
+  private bank: Bank = Bank.VAKIF;
   private transactionSheetName = 'Sheet1';
   private headerRowIndex = 6;
   private transactionLastRowIndex = 4;
   private baseCurrency: Currency = 'TRY';
   private targetCurrency: Currency = 'RUB';
-  balance: Balance = {
+  private balance: Balance = {
     endBalance: 0,
     startBalance: 0,
   };
@@ -51,12 +45,12 @@ class VakifParser {
     return this.convertData(convertedData);
   };
 
-  parseData = (buffer: ArrayBuffer) => {
+  private parseData = (buffer: ArrayBuffer) => {
     const data = new Uint8Array(buffer);
     return XLSX.read(data, { type: 'array' });
   };
 
-  findData = (workbook: XLSX.WorkBook | null): VakifTransactionDTO[] => {
+  private findData = (workbook: XLSX.WorkBook | null): VakifTransactionDTO[] => {
     if (!workbook) {
       throw new Error('Workbook is not defined');
     }
@@ -75,7 +69,7 @@ class VakifParser {
     return jsonData;
   };
 
-  updateBalance = (rows: VakifTransactionDTO[]) => {
+  private updateBalance = (rows: VakifTransactionDTO[]) => {
     if (!rows.length) {
       return;
     }
@@ -89,10 +83,16 @@ class VakifParser {
     };
   };
 
-  convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
+  private convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
+    let totalInflow = 0;
+    let totalOutflow = 0;
+
     const rows: RowDTO[] = data.map((item, id) => {
       const inflow = item.amount > 0 ? String(item.amount) : '';
       const outflow = item.amount < 0 ? String(Math.abs(item.amount)) : '';
+
+      totalInflow += Number(inflow);
+      totalOutflow += Number(outflow);
 
       return {
         ...item,
@@ -111,14 +111,16 @@ class VakifParser {
       baseCurrency: this.baseCurrency,
       date: new Date().toISOString(),
       id: '',
+      inflow: totalInflow,
       name,
+      outflow: totalOutflow,
       row: rows,
       targetCurrency: this.targetCurrency,
       ...this.balance,
     };
   };
 
-  prepareData = (data: VakifTransactionDTO[]): ImportTransactionDTO[] => {
+  private prepareData = (data: VakifTransactionDTO[]): ImportTransactionDTO[] => {
     const updatedData: ImportTransactionDTO[] = data.map((item) => {
       return {
         amount: item.AMOUNT ?? 0,

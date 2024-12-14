@@ -10,6 +10,8 @@ export type StatementDTO = {
   row: RowDTO[];
   startBalance: number;
   endBalance: number;
+  inflow: number;
+  outflow: number;
 };
 
 export type RawStatementDTO = Omit<StatementDTO, 'date' | 'id'> & {
@@ -19,13 +21,4 @@ export type RawStatementDTO = Omit<StatementDTO, 'date' | 'id'> & {
 
 export type RateUpdater = (date: string) => Promise<number | null>;
 
-export type TotalRow = {
-  amount: number;
-  amountInTargetCurrency: number;
-  inflow: number;
-  outflow: number;
-  id: string;
-  type: 'total';
-};
-
-export type TableRow = Row | TotalRow;
+export type TableRow = Row;

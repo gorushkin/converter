@@ -7,7 +7,7 @@ export const StatementInfo = observer(() => {
   const { name } = statementsStore.currentStatement;
   return (
     <div className={styles.wrapper}>
-      <h1 className={styles.title}>{name}</h1>
+      <h1 className={styles.title}>{name || 'NoName'}</h1>
     </div>
   );
 });

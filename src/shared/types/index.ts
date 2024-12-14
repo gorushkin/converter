@@ -32,3 +32,8 @@ const bankNameMap = {
 export const getBankName = (bank: Bank): string => {
   return bankNameMap[bank];
 };
+
+export type Balance = {
+  startBalance: number;
+  endBalance: number;
+};

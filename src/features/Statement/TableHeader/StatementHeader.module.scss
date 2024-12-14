@@ -1,0 +1,35 @@
+.wrapper {
+  display: flex;
+  column-gap: 16px;
+  justify-content: space-between;
+  background: #fafafa;
+}
+
+.cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.5714285714285714;
+  list-style: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  scrollbar-color: rgba(0, 0, 0, 0.25) rgba(5, 5, 5, 0.06);
+  border-collapse: separate;
+  border-spacing: 0;
+  box-sizing: border-box;
+  padding: 16px 16px;
+  overflow-wrap: break-word;
+  position: relative;
+  color: rgba(0, 0, 0, 0.88);
+  font-weight: 600;
+  text-align: start;
+  transition: background 0.2s ease;
+}
+
+.input {
+  display: block;
+  text-align: center;
+  max-width: 150px;
+  color: rgba(0, 0, 0, 0.88);
+}
