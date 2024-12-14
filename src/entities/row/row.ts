@@ -59,8 +59,8 @@ export class Row {
     );
 
     reaction(
-      () => JSON.stringify(this.date.value),
-      (a, b) => {
+      () => this.date.value,
+      () => {
         if (!this.date.isValid) return;
 
         void this.updateRate();
@@ -79,6 +79,8 @@ export class Row {
       this.memo.setValue(values.memo ?? '');
       this.payee.setValue(values.payee ?? '');
       this.id = values.id ?? '';
+
+      void this.updateRate();
 
       if (values.id) {
         this.mode = 'view';
