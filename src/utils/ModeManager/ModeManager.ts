@@ -9,22 +9,22 @@ export class ModeManager {
 
     makeAutoObservable(this);
   }
-  getMode() {
+  getMode = () => {
     return this.mode;
-  }
-  setMode(mode: Mode) {
+  };
+  setMode = (mode: Mode) => {
     this.mode = mode;
-  }
+  };
 
-  isEditMode() {
+  get isEditMode() {
     return this.mode === 'edit';
   }
 
-  isViewMode() {
+  get isViewMode() {
     return this.mode === 'view';
   }
 
-  toggleMode() {
+  toggleMode = () => {
     this.mode = this.mode === 'edit' ? 'view' : 'edit';
-  }
+  };
 }

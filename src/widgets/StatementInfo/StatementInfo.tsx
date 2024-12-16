@@ -1,13 +1,11 @@
-import { observer } from 'mobx-react-lite';
-import { statementsStore } from 'src/entities/statements';
+import { StatementEditableName } from 'src/features/Statement/StatementEditableName';
 
 import styles from './StatementInfo.module.scss';
 
-export const StatementInfo = observer(() => {
-  const { name } = statementsStore.currentStatement;
+export const StatementInfo = () => {
   return (
     <div className={styles.wrapper}>
-      <h1 className={styles.title}>{name || 'NoName'}</h1>
+      <StatementEditableName />
     </div>
   );
-});
+};
