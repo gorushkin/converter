@@ -12,7 +12,7 @@ export class Row {
   outflow = new Cell(0);
   amountInBaseCurrency = new Cell(0, validators.number);
   date = new Cell('', validators.date);
-  exchangeRate = new Cell(0);
+  exchangeRate = new Cell(0, validators.number);
   memo = new Cell('');
   payee = new Cell('');
   amountInTargetCurrency = new Cell(0);
@@ -40,6 +40,8 @@ export class Row {
         if (rate.isValid) {
           const result = Number(amount.value) * Number(rate.value);
           this.amountInTargetCurrency.setValue(String(result));
+        } else {
+          this.amountInTargetCurrency.setValue(0);
         }
       }
     );
@@ -73,14 +75,16 @@ export class Row {
       this.date.setValue(values.date ?? getCurrentDate());
       this.inflow.setValue(values.inflow ?? 0);
       this.outflow.setValue(values.outflow ?? 0);
+
+      const amountInTargetCurrency =
+        Number(values.amountInTargetCurrency) || Number(values.amountInBaseCurrency) * Number(values.exchangeRate) || 0;
+
       this.amountInBaseCurrency.setValue(values.amountInBaseCurrency ?? 0);
-      this.amountInTargetCurrency.setValue(values.amountInTargetCurrency ?? 0);
+      this.amountInTargetCurrency.setValue(amountInTargetCurrency);
       this.exchangeRate.setValue(values.exchangeRate ?? 0);
       this.memo.setValue(values.memo ?? '');
       this.payee.setValue(values.payee ?? '');
       this.id = values.id ?? '';
-
-      void this.updateRate();
 
       if (values.id) {
         this.mode = 'view';

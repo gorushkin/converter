@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import { ApiClient } from 'src/api';
 import { Row, type RowDTO } from 'src/entities/row';
 import { columns, Currency, type Balance } from 'src/shared/types';
@@ -9,8 +9,8 @@ import type { RateUpdater, StatementDTO } from './types';
 export class Statement {
   rows: Row[] = [];
   currentRow: Row;
-  targetCurrency: Currency = 'USD';
-  baseCurrency: Currency = 'RUB';
+  baseCurrency: Currency = 'USD';
+  targetCurrency: Currency = 'RUB';
   private apiClient = new ApiClient();
   name = '';
   id = '';
@@ -23,9 +23,16 @@ export class Statement {
   constructor(statement?: StatementDTO) {
     this.currentRow = new Row(this.rateUpdater);
 
-    this.load(statement);
+    void this.load(statement);
 
     makeAutoObservable(this);
+
+    reaction(
+      () => this.baseCurrency,
+      () => {
+        void this.updateRowsRates();
+      }
+    );
   }
 
   private rateUpdater: RateUpdater = async (date) => {
@@ -33,28 +40,30 @@ export class Statement {
 
     if (!result.ok) {
       console.error('Something went wrong');
-      return null;
+      return 0;
     }
 
     const rates = result.data.rates;
 
-    return rates[this.targetCurrency] ?? 0;
+    return rates[this.baseCurrency] ?? 0;
   };
 
-  load = (statement?: StatementDTO) => {
+  load = async (statement?: StatementDTO): Promise<void> => {
     if (!statement) return;
+
+    const updatedRows = await this.updateRowDTORates(statement.row);
 
     runInAction(() => {
       this.id = statement.id;
       this.name = statement.name;
       this.date = statement.date;
-      this.targetCurrency = statement.targetCurrency;
       this.baseCurrency = statement.baseCurrency;
+      this.targetCurrency = statement.targetCurrency;
       this.startBalance = statement.startBalance;
       this.endBalance = statement.endBalance;
       this.inflow = statement.inflow;
       this.outflow = statement.outflow;
-      this.rows = statement.row.map((row) => new Row(this.rateUpdater, row));
+      this.rows = updatedRows.map((row) => new Row(this.rateUpdater, row));
     });
   };
 
@@ -117,12 +126,12 @@ export class Statement {
     return [this.currentRow, ...this.rows];
   }
 
-  setTargetCurrency = (currency: Currency) => {
-    this.targetCurrency = currency;
-  };
-
   setBaseCurrency = (currency: Currency) => {
     this.baseCurrency = currency;
+  };
+
+  setTargetCurrency = (currency: Currency) => {
+    this.targetCurrency = currency;
   };
 
   sort = () => {
@@ -141,7 +150,7 @@ export class Statement {
     const getValues = (rows: Row[]) => {
       return rows.map(({ amountInBaseCurrency, date, exchangeRate: rate, inflow, memo, outflow, payee }) => {
         const amount = Math.abs(Number(amountInBaseCurrency.value));
-        const updatedMemo = `(${amount} ${this.targetCurrency} * ${rate.value}) ${memo.value}`;
+        const updatedMemo = `(${amount} ${this.baseCurrency} * ${rate.value}) ${memo.value}`;
 
         const updatedInflow = (Number(inflow.value) * Number(rate.value)).toFixed(2);
         const updatedOutflow = (Number(outflow.value) * Number(rate.value)).toFixed(2);
@@ -189,5 +198,33 @@ export class Statement {
     runInAction(() => {
       this.currentRow.exchangeRate.setValue(rate);
     });
+  };
+
+  updateRowsRates = async () => {
+    const promises = this.rows.map(async (row) => {
+      const rate = await this.rateUpdater(row.date.value);
+
+      runInAction(() => {
+        row.exchangeRate.setValue(rate);
+      });
+    });
+
+    await Promise.all(promises);
+  };
+
+  updateRowDTORates = async (row: RowDTO[]) => {
+    const promises = row.map(async (row) => {
+      const exchangeRate = Number(row.exchangeRate);
+
+      if (exchangeRate) {
+        return row;
+      }
+
+      const rate = await this.rateUpdater(row.date);
+
+      return { ...row, exchangeRate: String(rate) };
+    });
+
+    return await Promise.all(promises);
   };
 }
