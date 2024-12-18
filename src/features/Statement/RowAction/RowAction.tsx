@@ -32,13 +32,13 @@ export const RowAction = observer(({ row }: RowActionProps) => {
 
   return (
     <div className={styles.wrapper}>
-      <ActionButton color="#108ee9" disabled={!isEditingEnabled} onClick={row.toggleMode}>
+      <ActionButton variant="primary" disabled={!isEditingEnabled} onClick={row.toggleMode}>
         edit
       </ActionButton>
-      <ActionButton color="#87d068" type={buttonType} disabled={!isSavingEnabled} onClick={handleSaveClick}>
+      <ActionButton variant="success" type={buttonType} disabled={!isSavingEnabled} onClick={handleSaveClick}>
         save
       </ActionButton>
-      <ActionButton color="#f50" onClick={handleRemoveClick}>
+      <ActionButton variant="alert" onClick={handleRemoveClick}>
         delete
       </ActionButton>
     </div>

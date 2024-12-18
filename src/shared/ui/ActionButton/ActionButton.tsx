@@ -5,17 +5,28 @@ import { cn } from 'src/utils/tools';
 
 import styles from './ActionButton.module.scss';
 
+type Variant = 'alert' | 'primary' | 'success' | 'warning';
+
+const mapping: Record<Variant, string> = {
+  alert: '#f50',
+  primary: '#108ee9',
+  success: '#87d068',
+  warning: '#faad14',
+};
+
 type ActionButtonProps = DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
-  color?: string;
+  variant?: Variant;
   children: React.ReactNode;
 };
 
 export const ActionButton = (props: ActionButtonProps) => {
-  const { children, color, ...rest } = props;
+  const { children, variant, ...rest } = props;
 
   if (props.disabled) {
     return null;
   }
+
+  const color = mapping[variant ?? 'primary'];
 
   return (
     <button type="button" className={styles.wrapper} {...rest}>

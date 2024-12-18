@@ -2,35 +2,54 @@ import type { ReactNode } from 'react';
 
 import { Modal as AntdModal, Button } from 'antd';
 
+export type ModalType = {
+  close: () => void;
+  isOpen: boolean;
+  open: () => void;
+  toggle: () => void;
+};
+
 type ModalProps = {
   children: ReactNode;
   title: string;
   onOk?: () => void;
   onCancel?: () => void;
-  isOpen: boolean;
+  isOpen?: boolean;
   okButtonText?: string;
   cancelButtonText?: string;
   onClose?: () => void;
+  modal?: ModalType;
 };
 
 export const Modal = (props: ModalProps) => {
-  const { cancelButtonText, children, isOpen, okButtonText, onCancel, onOk, title } = props;
+  const { cancelButtonText, children, isOpen, modal, okButtonText, onCancel, onOk, title } = props;
+
+  const isModalOpen = modal ? modal.isOpen : isOpen;
+  const closeModal = modal ? modal.close : onCancel;
+
+  const handleCancelClick = () => {
+    onCancel?.();
+    closeModal?.();
+  };
+
+  const handleOkClick = () => {
+    onOk?.();
+    closeModal?.();
+  };
 
   return (
     <AntdModal
       footer={(_, { CancelBtn, OkBtn }) => {
         return (
           <>
-            {!!onCancel && (
-              <>
-                {cancelButtonText && <Button>{cancelButtonText}</Button>}
-                {!cancelButtonText && <CancelBtn />}
-              </>
-            )}
+            <>
+              {cancelButtonText && <Button onClick={handleCancelClick}>{cancelButtonText}</Button>}
+              {!cancelButtonText && <CancelBtn />}
+            </>
             {!!onOk && (
               <>
                 {okButtonText && (
-                  <Button onClick={onOk} type="primary">
+                  <Button onClick={handleOkClick} type="primary">
                     {okButtonText}
                   </Button>
                 )}
@@ -42,9 +61,9 @@ export const Modal = (props: ModalProps) => {
       }}
       centered
       title={title}
-      open={isOpen}
-      onOk={onOk}
-      onCancel={onCancel}
+      open={isModalOpen}
+      onOk={handleOkClick}
+      onCancel={handleCancelClick}
     >
       {children}
     </AntdModal>
