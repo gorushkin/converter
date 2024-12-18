@@ -59,7 +59,7 @@ class Statements {
   };
 
   importStatement = (statement: StatementDTO) => {
-    this.currentStatement.load(statement);
+    void this.currentStatement.load(statement);
   };
 }
 

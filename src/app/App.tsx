@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Row } from 'antd';
 import { statementsStore } from 'src/entities/statements';
 import { Actions } from 'src/features/Actions';
-import { Currencies } from 'src/widgets/Currencies';
+import { StatementCurrency } from 'src/features/StatementCurrency';
 import { StatementInfo } from 'src/widgets/StatementInfo';
 import { StatementWidget } from 'src/widgets/StatementWidget';
 
@@ -17,7 +17,7 @@ export const App = () => {
   return (
     <Row className={styles.wrapper}>
       <div className={styles.header}>
-        <Currencies />
+        <StatementCurrency />
         <StatementInfo />
         <Actions />
       </div>

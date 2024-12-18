@@ -9,8 +9,8 @@ import type { RateUpdater, StatementDTO } from './types';
 export class Statement {
   rows: Row[] = [];
   currentRow: Row;
-  baseCurrency: Currency = 'USD';
-  targetCurrency: Currency = 'RUB';
+  baseCurrency: Currency = Currency.USD;
+  targetCurrency: Currency = Currency.RUB;
   private apiClient = new ApiClient();
   name = '';
   id = '';

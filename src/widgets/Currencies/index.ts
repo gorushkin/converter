@@ -1,1 +1,0 @@
-export { Currencies } from './Currencies';

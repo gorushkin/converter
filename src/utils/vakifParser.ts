@@ -1,6 +1,6 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
-import { Bank, getBankName, ImportTransactionDTO, type Balance, type Currency } from 'src/shared/types';
+import { Bank, Currency, getBankName, ImportTransactionDTO, type Balance } from 'src/shared/types';
 import * as XLSX from 'xlsx';
 
 import { convertVakifToBaseDate, getISODate } from './formatters';
@@ -28,8 +28,8 @@ class VakifParser {
   private transactionSheetName = 'Sheet1';
   private headerRowIndex = 6;
   private transactionLastRowIndex = 4;
-  private baseCurrency: Currency = 'TRY';
-  private targetCurrency: Currency = 'RUB';
+  private baseCurrency: Currency = Currency.TRY;
+  private targetCurrency: Currency = Currency.RUB;
   private balance: Balance = {
     endBalance: 0,
     startBalance: 0,
@@ -131,6 +131,10 @@ class VakifParser {
     });
 
     return updatedData;
+  };
+
+  setData = (currency: Currency) => {
+    this.baseCurrency = currency;
   };
 }
 
