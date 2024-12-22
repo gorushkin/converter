@@ -5,6 +5,7 @@ import { ExportStatement } from 'src/features/ExportStatement';
 import { ImportStatement } from 'src/features/ImportStatement';
 import { LoadStatement } from 'src/features/LoadStatement';
 import { SaveStatement } from 'src/features/SaveStatement';
+import { SettingsButton } from 'src/features/SettingsButton';
 import { useModal } from 'src/shared/hooks/useModal';
 
 import styles from './Actions.module.scss';
@@ -42,6 +43,7 @@ export const Actions = observer(() => {
       <ImportStatement />
       <SaveStatement isOpen={saveModal.isOpen} onClose={saveModal.close} />
       <LoadStatement isOpen={loadModal.isOpen} onClose={loadModal.close} />
+      <SettingsButton className={styles.right} />
     </div>
   );
 });

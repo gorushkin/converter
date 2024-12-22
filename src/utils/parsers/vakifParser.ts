@@ -1,56 +1,19 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
-import { Bank, Currency, getBankName, ImportTransactionDTO, type Balance } from 'src/shared/types';
+import { Bank, getBankName, ImportTransactionDTO } from 'src/shared/types';
+import { convertVakifToBaseDate, getISODate } from 'src/utils/formatters';
 import * as XLSX from 'xlsx';
 
-import { convertVakifToBaseDate, getISODate } from './formatters';
+import { Parser } from './parser';
+import type { VakifTransactionDTO } from './types';
 
-type VakifTransactionDTO = {
-  'ACCOUNT NUMBER': string;
-  'RECEIPT NUMBER': number;
-  'TRANSACTION DATE': string;
-  'PROCESS DATE': string;
-  'CARD NUMBER': string;
-  'TRANSACTION  NAME': string;
-  AMOUNT: number;
-  BALANCE: number;
-  CHANNEL: string;
-  REFNO: string;
-  'TRANSACTION ID': string;
-  'IDENTIFICATION NUMBER': string;
-  'TAX NUMBER': string;
-  'D/C': string;
-  NARRATIVE: string;
-};
-
-class VakifParser {
-  private bank: Bank = Bank.VAKIF;
+export class VakifParser extends Parser<VakifTransactionDTO, VakifTransactionDTO> {
+  bank: Bank = Bank.VAKIF;
   private transactionSheetName = 'Sheet1';
   private headerRowIndex = 6;
   private transactionLastRowIndex = 4;
-  private baseCurrency: Currency = Currency.TRY;
-  private targetCurrency: Currency = Currency.RUB;
-  private balance: Balance = {
-    endBalance: 0,
-    startBalance: 0,
-  };
 
-  getData = (buffer: ArrayBuffer): null | StatementDTO => {
-    const workbook = this.parseData(buffer);
-
-    const clearData = this.findData(workbook);
-
-    const convertedData = this.prepareData(clearData);
-
-    return this.convertData(convertedData);
-  };
-
-  private parseData = (buffer: ArrayBuffer) => {
-    const data = new Uint8Array(buffer);
-    return XLSX.read(data, { type: 'array' });
-  };
-
-  private findData = (workbook: XLSX.WorkBook | null): VakifTransactionDTO[] => {
+  protected findData = (workbook: XLSX.WorkBook | null): VakifTransactionDTO[] => {
     if (!workbook) {
       throw new Error('Workbook is not defined');
     }
@@ -69,7 +32,7 @@ class VakifParser {
     return jsonData;
   };
 
-  private updateBalance = (rows: VakifTransactionDTO[]) => {
+  protected updateBalance = (rows: VakifTransactionDTO[]): void => {
     if (!rows.length) {
       return;
     }
@@ -83,7 +46,7 @@ class VakifParser {
     };
   };
 
-  private convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
+  protected convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
     let totalInflow = 0;
     let totalOutflow = 0;
 
@@ -120,7 +83,7 @@ class VakifParser {
     };
   };
 
-  private prepareData = (data: VakifTransactionDTO[]): ImportTransactionDTO[] => {
+  protected prepareData = (data: VakifTransactionDTO[]): ImportTransactionDTO[] => {
     const updatedData: ImportTransactionDTO[] = data.map((item) => {
       return {
         amount: item.AMOUNT ?? 0,
@@ -132,10 +95,4 @@ class VakifParser {
 
     return updatedData;
   };
-
-  setData = (currency: Currency) => {
-    this.baseCurrency = currency;
-  };
 }
-
-export const vakifParser = new VakifParser();
