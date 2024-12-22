@@ -13,6 +13,7 @@ export class Row {
   amountInBaseCurrency = new Cell(0, validators.number);
   date = new Cell('', validators.date);
   exchangeRate = new Cell(0, validators.number);
+  runningBalance = new Cell(0);
   memo = new Cell('');
   payee = new Cell('');
   amountInTargetCurrency = new Cell(0);
@@ -85,6 +86,7 @@ export class Row {
       this.memo.setValue(values.memo ?? '');
       this.payee.setValue(values.payee ?? '');
       this.id = values.id ?? '';
+      this.runningBalance.setValue(values.runningBalance ?? 0);
 
       if (values.id) {
         this.mode = 'view';
@@ -126,6 +128,7 @@ export class Row {
       memo: this.memo.value,
       outflow: this.outflow.value,
       payee: this.payee.value,
+      runningBalance: this.runningBalance.value,
     };
   }
 
@@ -163,6 +166,7 @@ export class Row {
       this.outflow.setValue(values.outflow);
       this.date.setValue(values.date);
       this.exchangeRate.setValue(values.exchangeRate);
+      this.runningBalance.setValue(values.runningBalance);
     });
   };
 }

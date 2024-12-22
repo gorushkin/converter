@@ -62,9 +62,12 @@ export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
   };
 
   convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
+    let runningBalance = this.balance.startBalance;
+
     const rows: RowDTO[] = data.map((item, id) => {
       const inflow = item.amount > 0 ? String(item.amount) : '';
       const outflow = item.amount < 0 ? String(Math.abs(item.amount)) : '';
+      runningBalance = runningBalance + Number(item.amount);
 
       return {
         ...item,
@@ -74,10 +77,10 @@ export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
         id: String(id),
         inflow,
         outflow,
+        runningBalance: String(runningBalance),
       };
     });
 
-    // TODO: replace 0 with real data
     return {
       baseCurrency: Currency.GEL,
       date: new Date().toISOString(),
