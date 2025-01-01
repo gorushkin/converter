@@ -53,6 +53,8 @@ export class Statement {
 
     const updatedRows = await this.updateRowDTORates(statement.row);
 
+    let currentRow: Row | null = null;
+
     runInAction(() => {
       this.id = statement.id;
       this.name = statement.name;
@@ -63,7 +65,14 @@ export class Statement {
       this.endBalance = statement.endBalance;
       this.inflow = statement.inflow;
       this.outflow = statement.outflow;
-      this.rows = updatedRows.map((row) => new Row(this.rateUpdater, row));
+      this.rows = updatedRows.map((rowDTO) => {
+        const prevRow = currentRow;
+
+        const row = new Row(this.rateUpdater, rowDTO, prevRow);
+        currentRow = row;
+
+        return row;
+      });
     });
   };
 

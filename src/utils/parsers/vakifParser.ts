@@ -49,12 +49,10 @@ export class VakifParser extends Parser<VakifTransactionDTO, VakifTransactionDTO
   protected convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
     let totalInflow = 0;
     let totalOutflow = 0;
-    let runningBalance = this.balance.startBalance;
 
     const rows: RowDTO[] = data.map((item, id) => {
       const inflow = item.amount > 0 ? String(item.amount) : '';
       const outflow = item.amount < 0 ? String(Math.abs(item.amount)) : '';
-      runningBalance = runningBalance + Number(item.amount);
 
       totalInflow += Number(inflow);
       totalOutflow += Number(outflow);
@@ -67,7 +65,7 @@ export class VakifParser extends Parser<VakifTransactionDTO, VakifTransactionDTO
         id: String(id),
         inflow,
         outflow,
-        runningBalance: String(runningBalance),
+        startBalance: String(this.balance.startBalance),
       };
     });
 

@@ -1,4 +1,4 @@
-import { makeAutoObservable, reaction, runInAction } from 'mobx';
+import { autorun, makeAutoObservable, reaction, runInAction } from 'mobx';
 import type { RowDTO } from 'src/entities/row';
 import type { RateUpdater } from 'src/entities/statement';
 import { validators } from 'src/shared/utils';
@@ -13,18 +13,22 @@ export class Row {
   amountInBaseCurrency = new Cell(0, validators.number);
   date = new Cell('', validators.date);
   exchangeRate = new Cell(0, validators.number);
+  startBalance = new Cell(0);
   runningBalance = new Cell(0);
   memo = new Cell('');
   payee = new Cell('');
   amountInTargetCurrency = new Cell(0);
   mode: 'edit' | 'view' = 'view';
+  prevRow: Row | null = null;
 
   updater: RateUpdater;
 
-  constructor(updater: RateUpdater, values: Partial<RowDTO> = {}) {
+  constructor(updater: RateUpdater, values: Partial<RowDTO> = {}, prevRow: Row | null = null) {
     this.updater = updater;
 
     this.setValues(values);
+
+    this.prevRow = prevRow;
 
     makeAutoObservable(this);
 
@@ -69,6 +73,15 @@ export class Row {
         void this.updateRate();
       }
     );
+
+    autorun(() => {
+      if (this.prevRow) {
+        const runningBalance = Number(this.prevRow.runningBalance.value) + Number(this.amountInBaseCurrency.value);
+        this.runningBalance.setValue(runningBalance);
+      } else {
+        this.runningBalance.setValue(Number(this.startBalance.value) + Number(this.amountInBaseCurrency.value));
+      }
+    });
   }
 
   setValues = (values: Partial<RowDTO> = {}) => {
@@ -86,7 +99,7 @@ export class Row {
       this.memo.setValue(values.memo ?? '');
       this.payee.setValue(values.payee ?? '');
       this.id = values.id ?? '';
-      this.runningBalance.setValue(values.runningBalance ?? 0);
+      this.startBalance.setValue(values.startBalance ?? 0);
 
       if (values.id) {
         this.mode = 'view';
@@ -128,7 +141,7 @@ export class Row {
       memo: this.memo.value,
       outflow: this.outflow.value,
       payee: this.payee.value,
-      runningBalance: this.runningBalance.value,
+      startBalance: this.startBalance.value,
     };
   }
 
@@ -166,7 +179,6 @@ export class Row {
       this.outflow.setValue(values.outflow);
       this.date.setValue(values.date);
       this.exchangeRate.setValue(values.exchangeRate);
-      this.runningBalance.setValue(values.runningBalance);
     });
   };
 }
