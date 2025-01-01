@@ -3,8 +3,8 @@ import { useRef, useState } from 'react';
 import { CloseCircleFilled } from '@ant-design/icons';
 import { Button } from 'antd';
 import { observer } from 'mobx-react-lite';
+import { settings } from 'src/entities/settings/settings';
 import { statementsStore } from 'src/entities/statements';
-import { vakifParser } from 'src/utils/vakifParser';
 
 import styles from './ImportStatement.module.scss';
 
@@ -13,6 +13,8 @@ export const ImportStatement = observer(() => {
     currentStatement: { reset },
     importStatement,
   } = statementsStore;
+
+  const { parser } = settings;
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -27,7 +29,8 @@ export const ImportStatement = observer(() => {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result && typeof event.target.result !== 'string') {
-          const statement = vakifParser.getData(event.target.result);
+          // vakifParser.setData(baseCurrency);
+          const statement = parser.getData(event.target.result);
 
           if (statement) {
             importStatement(statement);
@@ -36,12 +39,6 @@ export const ImportStatement = observer(() => {
       };
 
       reader.readAsArrayBuffer(file);
-    }
-  };
-
-  const handleButtonClick = () => {
-    if (inputRef.current) {
-      inputRef.current.click();
     }
   };
 
@@ -54,6 +51,12 @@ export const ImportStatement = observer(() => {
     }
 
     inputRef.current.value = '';
+  };
+
+  const handleButtonClick = () => {
+    if (inputRef.current) {
+      inputRef.current.click();
+    }
   };
 
   return (

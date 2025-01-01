@@ -1,4 +1,20 @@
-export type Currency = 'USD' | 'EUR' | 'NZD' | 'TRY' | 'RUB' | 'GEL';
+export enum Currency {
+  USD = 'USD',
+  EUR = 'EUR',
+  NZD = 'NZD',
+  TRY = 'TRY',
+  RUB = 'RUB',
+  GEL = 'GEL',
+}
+
+export const currencies: Currency[] = [
+  Currency.USD,
+  Currency.EUR,
+  Currency.NZD,
+  Currency.TRY,
+  Currency.RUB,
+  Currency.GEL,
+];
 
 export enum Column {
   DATE = 'Date',
@@ -18,9 +34,9 @@ export type ImportTransactionDTO = {
 };
 
 export enum Bank {
-  BOG = 'bog',
-  TBC = 'tbc',
-  VAKIF = 'vakif',
+  BOG = 'BOG',
+  TBC = 'TBC',
+  VAKIF = 'VAKIF',
 }
 
 const bankNameMap = {

@@ -8,4 +8,5 @@ export type RowDTO = {
   exchangeRate: string;
   amountInBaseCurrency: string;
   amountInTargetCurrency: string;
+  runningBalance: string;
 };

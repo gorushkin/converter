@@ -47,7 +47,7 @@ class Statements {
   loadStatement = (id: string) => {
     const statement = this.statements.find((s) => s.id === id);
 
-    this.currentStatement.load(statement);
+    void this.currentStatement.load(statement);
   };
 
   deleteStatement = () => {
@@ -59,7 +59,7 @@ class Statements {
   };
 
   importStatement = (statement: StatementDTO) => {
-    this.currentStatement.load(statement);
+    void this.currentStatement.load(statement);
   };
 }
 
