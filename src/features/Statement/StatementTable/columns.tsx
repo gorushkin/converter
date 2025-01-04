@@ -45,12 +45,6 @@ export const columns: ColumnsType<TableRow> = [
     title: 'amount',
   },
   {
-    dataIndex: 'runningBalance',
-    key: 'runningBalance',
-    render: (cell: Cell<number>) => <RenderCurrencyCell cell={cell} />,
-    title: 'Running balance',
-  },
-  {
     dataIndex: 'memo',
     key: 'memo',
     render: (cell: Cell<string>, row) => (

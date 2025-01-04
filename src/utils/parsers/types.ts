@@ -37,6 +37,6 @@ export type BogDetailsDTO = {
 };
 
 export type BogResult = {
-  USD: ImportTransactionDTO[];
-  GEL: ImportTransactionDTO[];
+  [Currency.USD]: ImportTransactionDTO[];
+  [Currency.GEL]: ImportTransactionDTO[];
 };

@@ -29,7 +29,6 @@ export const ImportStatement = observer(() => {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result && typeof event.target.result !== 'string') {
-          // vakifParser.setData(baseCurrency);
           const statement = parser.getData(event.target.result);
 
           if (statement) {

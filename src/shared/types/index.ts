@@ -34,13 +34,15 @@ export type ImportTransactionDTO = {
 };
 
 export enum Bank {
-  BOG = 'BOG',
+  BOGRetail = 'BOGRetail',
+  BOGBusiness = 'BOGBusiness',
   TBC = 'TBC',
   VAKIF = 'VAKIF',
 }
 
 const bankNameMap = {
-  [Bank.BOG]: 'BOG',
+  [Bank.BOGBusiness]: 'BOG Business',
+  [Bank.BOGRetail]: 'BOG Retail',
   [Bank.TBC]: 'TBC',
   [Bank.VAKIF]: 'Vakif',
 };

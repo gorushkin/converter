@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx';
 import { Parser } from './parser';
 import type { BOGTransactionDTO, BogDetailsDTO, BogResult } from './types';
 
-export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
+export class bogRetailParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
   rawData: ArrayBuffer | null = null;
   workbook: XLSX.WorkBook | null = null;
   private transactionSheetName = 'Transactions';
@@ -55,10 +55,14 @@ export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
 
         return transactions;
       },
-      { GEL: [], USD: [] }
+      { [Currency.GEL]: [], [Currency.USD]: [] }
     );
 
-    return results.GEL;
+    if (!results[this.baseCurrency as keyof typeof results]) {
+      return [];
+    }
+
+    return results[this.baseCurrency as keyof typeof results];
   };
 
   convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
@@ -82,7 +86,7 @@ export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
     });
 
     return {
-      baseCurrency: Currency.GEL,
+      baseCurrency: this.baseCurrency,
       date: new Date().toISOString(),
       endBalance: this.balance.endBalance,
       id: '',
