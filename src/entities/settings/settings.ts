@@ -1,28 +1,37 @@
 import { makeAutoObservable } from 'mobx';
 import { Bank, Currency } from 'src/shared/types';
-import { Parser, VakifParser, BogParser } from 'src/utils/parsers';
+import { Parser, VakifParser, bogBusinessParser, bogRetailParser } from 'src/utils/parsers';
+import { settingStorage } from 'src/utils/storage';
 
-const parserMapper: Record<Bank, typeof VakifParser | typeof BogParser> = {
-  [Bank.BOG]: BogParser,
+const parserMapper: Record<Bank, typeof VakifParser | typeof bogRetailParser | typeof bogBusinessParser> = {
+  [Bank.BOGBusiness]: bogBusinessParser,
+  [Bank.BOGRetail]: bogRetailParser,
   [Bank.TBC]: VakifParser,
   [Bank.VAKIF]: VakifParser,
 };
 
+export type SettingsDTO = { bank: Bank; baseCurrency: Currency };
+
 class Settings {
-  constructor(
-    public bank: Bank,
-    public baseCurrency: Currency,
-    public isOpen = false
-  ) {
+  private storage = settingStorage;
+  private bank: Bank;
+  private baseCurrency: Currency;
+
+  constructor(public isOpen = false) {
+    this.bank = this.storage.getBank();
+    this.baseCurrency = this.storage.getBaseCurrency();
+
     makeAutoObservable(this);
   }
 
   setBank = (bank: Bank) => {
     this.bank = bank;
+    this.storage.setBank(bank);
   };
 
   setBaseCurrency = (currency: Currency) => {
     this.baseCurrency = currency;
+    this.storage.setBaseCurrency(currency);
   };
 
   toggle = () => {
@@ -34,4 +43,4 @@ class Settings {
   }
 }
 
-export const settings = new Settings(Bank.BOG, Currency.GEL);
+export const settings = new Settings();

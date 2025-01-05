@@ -1,13 +1,13 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
 import { Currency, ImportTransactionDTO } from 'src/shared/types';
-import { convertBogToBaseDate } from 'src/utils/formatters';
+import { convertBogRetailToBaseDate } from 'src/utils/formatters';
 import * as XLSX from 'xlsx';
 
 import { Parser } from './parser';
 import type { BOGTransactionDTO, BogDetailsDTO, BogResult } from './types';
 
-export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
+export class bogRetailParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
   rawData: ArrayBuffer | null = null;
   workbook: XLSX.WorkBook | null = null;
   private transactionSheetName = 'Transactions';
@@ -35,7 +35,7 @@ export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
         const currency = item.USD ? 'USD' : 'GEL';
 
         const amount = Number(item[currency as keyof BOGTransactionDTO]);
-        const date = convertBogToBaseDate(item.Date);
+        const date = convertBogRetailToBaseDate(item.Date);
 
         const memo = item.Details;
         const payee = '';
@@ -55,10 +55,14 @@ export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
 
         return transactions;
       },
-      { GEL: [], USD: [] }
+      { [Currency.GEL]: [], [Currency.USD]: [] }
     );
 
-    return results.GEL;
+    if (!results[this.baseCurrency as keyof typeof results]) {
+      return [];
+    }
+
+    return results[this.baseCurrency as keyof typeof results];
   };
 
   convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
@@ -82,7 +86,7 @@ export class BogParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
     });
 
     return {
-      baseCurrency: Currency.GEL,
+      baseCurrency: this.baseCurrency,
       date: new Date().toISOString(),
       endBalance: this.balance.endBalance,
       id: '',

@@ -1,10 +1,13 @@
+import type { SettingsDTO } from 'src/entities/settings/settings';
 import type { StatementDTO } from 'src/entities/statement';
+import { Bank, Currency } from 'src/shared/types';
 
 class Storage<T> {
-  key = 'statement';
+  key: string;
   initialData: T;
 
-  constructor(initialData: T) {
+  constructor(key: string, initialData: T) {
+    this.key = key;
     this.initialData = initialData;
   }
 
@@ -22,9 +25,31 @@ class Storage<T> {
   }
 }
 
+export class SettingsStorage extends Storage<SettingsDTO> {
+  constructor(settings: SettingsDTO) {
+    super('settings', settings);
+  }
+
+  getBank() {
+    return this.get().bank;
+  }
+
+  getBaseCurrency() {
+    return this.get().baseCurrency;
+  }
+
+  setBank(bank: SettingsDTO['bank']) {
+    this.set({ ...this.get(), bank });
+  }
+
+  setBaseCurrency(baseCurrency: SettingsDTO['baseCurrency']) {
+    this.set({ ...this.get(), baseCurrency });
+  }
+}
+
 export class StatementsStorage extends Storage<{ statements: StatementDTO[] }> {
   constructor() {
-    super({ statements: [] });
+    super('statements', { statements: [] });
   }
 
   getAll(): StatementDTO[] {
@@ -54,3 +79,4 @@ export class StatementsStorage extends Storage<{ statements: StatementDTO[] }> {
 }
 
 export const statementsStorage = new StatementsStorage();
+export const settingStorage = new SettingsStorage({ bank: Bank.BOGBusiness, baseCurrency: Currency.USD });
