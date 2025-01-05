@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 import { Bank, Currency } from 'src/shared/types';
 import { Parser, VakifParser, bogBusinessParser, bogRetailParser } from 'src/utils/parsers';
+import { settingStorage } from 'src/utils/storage';
 
 const parserMapper: Record<Bank, typeof VakifParser | typeof bogRetailParser | typeof bogBusinessParser> = {
   [Bank.BOGBusiness]: bogBusinessParser,
@@ -9,21 +10,28 @@ const parserMapper: Record<Bank, typeof VakifParser | typeof bogRetailParser | t
   [Bank.VAKIF]: VakifParser,
 };
 
+export type SettingsDTO = { bank: Bank; baseCurrency: Currency };
+
 class Settings {
-  constructor(
-    public bank: Bank,
-    public baseCurrency: Currency,
-    public isOpen = false
-  ) {
+  private storage = settingStorage;
+  private bank: Bank;
+  private baseCurrency: Currency;
+
+  constructor(public isOpen = false) {
+    this.bank = this.storage.getBank();
+    this.baseCurrency = this.storage.getBaseCurrency();
+
     makeAutoObservable(this);
   }
 
   setBank = (bank: Bank) => {
     this.bank = bank;
+    this.storage.setBank(bank);
   };
 
   setBaseCurrency = (currency: Currency) => {
     this.baseCurrency = currency;
+    this.storage.setBaseCurrency(currency);
   };
 
   toggle = () => {
@@ -35,4 +43,4 @@ class Settings {
   }
 }
 
-export const settings = new Settings(Bank.BOGRetail, Currency.GEL);
+export const settings = new Settings();

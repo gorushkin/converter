@@ -4,7 +4,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'; // ES 2015
 dayjs.extend(customParseFormat);
 
 const BASE_DATE_FORMAT = 'YYYY-MM-DD';
-const BOG_DATE_FORMAT = 'DD/MM/YYYY';
+const BOG_RETAIL_DATE_FORMAT = 'DD/MM/YYYY';
+const BOG_BUSINESS_DATE_FORMAT = 'M/D/YY';
 const VAKIF_DATE_FORMAT = 'DD.MM.YYYY HH:mm';
 
 export const getCurrentDate = (): string => dayjs().format(BASE_DATE_FORMAT);
@@ -26,7 +27,10 @@ export const numberToUICurrency = (number: number) =>
 
 export const numberToCopyCurrency = (number: string) => number.replace('.', ',');
 
-export const convertBogToBaseDate = formatDate(BOG_DATE_FORMAT)(BASE_DATE_FORMAT);
+export const convertBogRetailToBaseDate = formatDate(BOG_RETAIL_DATE_FORMAT)(BASE_DATE_FORMAT);
+export const convertBogBusinessToBaseDate = formatDate(BOG_BUSINESS_DATE_FORMAT)(BASE_DATE_FORMAT);
 export const convertVakifToBaseDate = formatDate(VAKIF_DATE_FORMAT)(BASE_DATE_FORMAT);
 
 export const getISODate = (date?: string) => dayjs(date).toISOString();
+
+export const parseNumber = (value: string): number => parseFloat(value.replace(/,/g, ''));

@@ -32,7 +32,7 @@ export abstract class Parser<T, K> {
 
   private parseData = (buffer: ArrayBuffer) => {
     const data = new Uint8Array(buffer);
-    return XLSX.read(data, { type: 'array' });
+    return XLSX.read(data, { cellDates: true, type: 'array' });
   };
 
   protected abstract updateBalance(rows: K[]): void;

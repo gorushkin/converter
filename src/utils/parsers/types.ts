@@ -40,3 +40,45 @@ export type BogResult = {
   [Currency.USD]: ImportTransactionDTO[];
   [Currency.GEL]: ImportTransactionDTO[];
 };
+
+export type BOGBusinessTransactionDTO = {
+  Date: string;
+  'Doc N': string;
+  'Loro Account': string;
+  ' Credit'?: string;
+  Debit?: string;
+  Rate: string;
+  'Credit Amount in Gel': number;
+  'Entry Comment': string;
+  'Operation Type': string;
+  'Operation ID': number;
+  Ref: number;
+  'Sender Name': string;
+  'Sender Account N': string;
+  'Sender Bank Code': string;
+  ' Recipient Name': string;
+  'Recipient Number Taxpayer': string;
+  'Recipient Account N': string;
+  'Recipient Bank Code': string;
+  'Recipient Bank Name': string;
+  Nomination: string;
+  ' Additional Info': string;
+  Amount: number;
+  'Amount in Gel': number;
+  'Turnover Credit': number;
+  'Turnover Credit in Gel': number;
+  'Balance at end of day': number;
+  'Balance at end of day in Gel': number;
+  Balance: string;
+};
+
+export type BOGBusinessDetails = [
+  {
+    __EMPTY: string;
+    __EMPTY_1: number;
+  },
+  {
+    __EMPTY: string;
+    __EMPTY_1: number;
+  },
+];

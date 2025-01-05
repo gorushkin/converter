@@ -1,68 +1,66 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
 import { Currency, ImportTransactionDTO } from 'src/shared/types';
-import { convertBogToBaseDate } from 'src/utils/formatters';
+import { convertBogBusinessToBaseDate, parseNumber } from 'src/utils/formatters';
 import * as XLSX from 'xlsx';
 
 import { Parser } from './parser';
-import type { BOGTransactionDTO, BogDetailsDTO, BogResult } from './types';
+import type { BOGBusinessDetails, BOGBusinessTransactionDTO, BogDetailsDTO } from './types';
 
-export class bogBusinessParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
+export class bogBusinessParser extends Parser<BOGBusinessTransactionDTO, BogDetailsDTO> {
   rawData: ArrayBuffer | null = null;
   workbook: XLSX.WorkBook | null = null;
-  private transactionSheetName = 'Transactions';
-  private detailsSheetName = 'Details';
+  private transactionSheetName = 'Statement of Account';
 
-  protected findData = (workbook: XLSX.WorkBook | null) => {
+  private startBalanceRowIndex = 5;
+  private endBalanceRowIndex = 7;
+  private headerRowIndex = 14;
+
+  protected findData = (workbook: XLSX.WorkBook | null): BOGBusinessTransactionDTO[] => {
     if (!workbook) {
       throw new Error('Workbook is not defined');
     }
 
     const sheet = workbook.Sheets[this.transactionSheetName];
-    const detailsSheet = workbook.Sheets[this.detailsSheetName];
-    const rowsJsonData: BOGTransactionDTO[] = XLSX.utils.sheet_to_json(sheet);
-    const detailsJsonData: BogDetailsDTO[] = XLSX.utils.sheet_to_json(detailsSheet);
-    const jsonDataWithoutEmptyRows = rowsJsonData.filter((item) => item.Date !== 'Balance');
 
-    this.updateBalance(detailsJsonData);
+    const jsonData: BOGBusinessTransactionDTO[] = XLSX.utils.sheet_to_json(sheet, {
+      header: this.headerRowIndex,
+      range: this.headerRowIndex,
+      raw: false,
+    });
 
-    return jsonDataWithoutEmptyRows;
+    this.updateBalance(sheet);
+
+    return jsonData;
   };
 
-  prepareData = (data: BOGTransactionDTO[]): ImportTransactionDTO[] => {
-    const results: BogResult = data.reduce<BogResult>(
-      (transactions, item) => {
-        const currency = item.USD ? 'USD' : 'GEL';
-
-        const amount = Number(item[currency as keyof BOGTransactionDTO]);
-        const date = convertBogToBaseDate(item.Date);
-
-        const memo = item.Details;
-        const payee = '';
-
-        const USD = transactions.USD;
-        const GEL = transactions.GEL;
-
-        const payload: ImportTransactionDTO = { amount, date, memo, payee };
-
-        if (currency === 'USD') {
-          USD.push(payload);
+  prepareData = (data: BOGBusinessTransactionDTO[]): ImportTransactionDTO[] => {
+    return data.map((item) => {
+      const getAmount = (debit?: string, credit?: string) => {
+        if (debit) {
+          return -parseNumber(debit);
         }
 
-        if (currency === 'GEL') {
-          GEL.push(payload);
+        if (credit) {
+          return parseNumber(credit);
         }
 
-        return transactions;
-      },
-      { [Currency.GEL]: [], [Currency.USD]: [] }
-    );
+        return 0;
+      };
 
-    if (!results[this.baseCurrency as keyof typeof results]) {
-      return [];
-    }
+      const amount = getAmount(item.Debit, item[' Credit']);
+      const date = convertBogBusinessToBaseDate(item.Date);
 
-    return results[this.baseCurrency as keyof typeof results];
+      const memo = item['Entry Comment'];
+      const payee = '';
+
+      return {
+        amount,
+        date,
+        memo,
+        payee,
+      };
+    });
   };
 
   convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
@@ -107,13 +105,14 @@ export class bogBusinessParser extends Parser<BOGTransactionDTO, BogDetailsDTO> 
     return parseFloat(row ?? '');
   };
 
-  protected updateBalance = (rows: BogDetailsDTO[]): void => {
-    if (!rows.length) {
-      return;
-    }
+  protected updateBalance = (sheet: XLSX.WorkSheet): void => {
+    const details: BOGBusinessDetails = XLSX.utils
+      .sheet_to_json(sheet)
+      .slice(this.startBalanceRowIndex, this.endBalanceRowIndex) as BOGBusinessDetails;
 
-    const startBalance = this.getBalance(rows[5]);
-    const endBalance = this.getBalance(rows[9]);
+    const startBalance = Number(details[0].__EMPTY_1);
+
+    const endBalance = Number(details[1].__EMPTY_1);
 
     this.balance = {
       endBalance,

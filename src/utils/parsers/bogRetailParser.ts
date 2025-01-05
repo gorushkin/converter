@@ -1,7 +1,7 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
 import { Currency, ImportTransactionDTO } from 'src/shared/types';
-import { convertBogToBaseDate } from 'src/utils/formatters';
+import { convertBogRetailToBaseDate } from 'src/utils/formatters';
 import * as XLSX from 'xlsx';
 
 import { Parser } from './parser';
@@ -35,7 +35,7 @@ export class bogRetailParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
         const currency = item.USD ? 'USD' : 'GEL';
 
         const amount = Number(item[currency as keyof BOGTransactionDTO]);
-        const date = convertBogToBaseDate(item.Date);
+        const date = convertBogRetailToBaseDate(item.Date);
 
         const memo = item.Details;
         const payee = '';
