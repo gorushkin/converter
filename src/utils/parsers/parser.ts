@@ -2,7 +2,7 @@ import type { StatementDTO } from 'src/entities/statement';
 import type { Balance, Bank, Currency, ImportTransactionDTO } from 'src/shared/types';
 import * as XLSX from 'xlsx';
 
-export abstract class Parser<T, K> {
+export abstract class Parser<I, T, K> {
   protected bank: Bank;
   protected baseCurrency: Currency;
   protected targetCurrency: Currency;
@@ -20,23 +20,30 @@ export abstract class Parser<T, K> {
     this.targetCurrency = targetCurrency;
   }
 
-  getData = (buffer: ArrayBuffer): null | StatementDTO => {
-    const workbook = this.parseData(buffer);
+  getData = (buffer: ArrayBuffer | string): null | StatementDTO => {
+    const parsedData = this.parseData(buffer);
 
-    const clearData = this.findData(workbook);
-
-    const convertedData = this.prepareData(clearData);
+    const convertedData = this.prepareData(parsedData);
 
     return this.convertData(convertedData);
   };
 
-  private parseData = (buffer: ArrayBuffer) => {
-    const data = new Uint8Array(buffer);
-    return XLSX.read(data, { cellDates: true, type: 'array' });
-  };
+  protected abstract parseData(buffer: ArrayBuffer | string): T[];
 
   protected abstract updateBalance(rows: K[]): void;
-  protected abstract findData(workbook: XLSX.WorkBook | null): T[];
+  protected abstract findData(workbook: I | null): T[];
   protected abstract prepareData(data: T[]): ImportTransactionDTO[];
   protected abstract convertData(data: ImportTransactionDTO[]): StatementDTO | null;
 }
+
+export abstract class XLSXParser<T, K> extends Parser<XLSX.WorkBook, T, K> {
+  protected parseData(buffer: ArrayBuffer): T[] {
+    const data = new Uint8Array(buffer);
+
+    const workbook = XLSX.read(data, { cellDates: true, type: 'array' });
+
+    return this.findData(workbook);
+  }
+}
+
+export abstract class CSVParser<T, K> extends Parser<string, T, K> {}

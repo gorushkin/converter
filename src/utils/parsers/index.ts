@@ -1,4 +1,5 @@
 export { VakifParser } from './vakifParser';
-export { bogRetailParser } from './bogRetailParser';
-export { bogBusinessParser } from './bogBusinessParser';
+export { BogRetailParser } from './bogRetailParser';
+export { BogBusinessParser } from './bogBusinessParser';
+export { TbcBusinessParser } from './tbcBusinessParser';
 export { Parser } from './parser';

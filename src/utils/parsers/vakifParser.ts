@@ -4,10 +4,10 @@ import { Bank, getBankName, ImportTransactionDTO } from 'src/shared/types';
 import { convertVakifToBaseDate, getISODate } from 'src/utils/formatters';
 import * as XLSX from 'xlsx';
 
-import { Parser } from './parser';
+import { XLSXParser } from './parser';
 import type { VakifTransactionDTO } from './types';
 
-export class VakifParser extends Parser<VakifTransactionDTO, VakifTransactionDTO> {
+export class VakifParser extends XLSXParser<VakifTransactionDTO, VakifTransactionDTO> {
   bank: Bank = Bank.VAKIF;
   private transactionSheetName = 'Sheet1';
   private headerRowIndex = 6;

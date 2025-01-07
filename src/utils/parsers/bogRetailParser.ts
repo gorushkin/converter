@@ -4,10 +4,10 @@ import { Currency, ImportTransactionDTO } from 'src/shared/types';
 import { convertBogRetailToBaseDate } from 'src/utils/formatters';
 import * as XLSX from 'xlsx';
 
-import { Parser } from './parser';
+import { XLSXParser } from './parser';
 import type { BOGTransactionDTO, BogDetailsDTO, BogResult } from './types';
 
-export class bogRetailParser extends Parser<BOGTransactionDTO, BogDetailsDTO> {
+export class BogRetailParser extends XLSXParser<BOGTransactionDTO, BogDetailsDTO> {
   rawData: ArrayBuffer | null = null;
   workbook: XLSX.WorkBook | null = null;
   private transactionSheetName = 'Transactions';
