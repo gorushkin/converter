@@ -1,8 +1,9 @@
 import type { StatementDTO } from 'src/entities/statement';
 import type { Balance, Bank, Currency, ImportTransactionDTO } from 'src/shared/types';
+import type { WorkBook } from 'xlsx';
 import * as XLSX from 'xlsx';
 
-export abstract class Parser<I, T, K> {
+export abstract class Parser<T, K> {
   protected bank: Bank;
   protected baseCurrency: Currency;
   protected targetCurrency: Currency;
@@ -31,12 +32,11 @@ export abstract class Parser<I, T, K> {
   protected abstract parseData(buffer: ArrayBuffer | string): T[];
 
   protected abstract updateBalance(rows: K[]): void;
-  protected abstract findData(workbook: I | null): T[];
   protected abstract prepareData(data: T[]): ImportTransactionDTO[];
   protected abstract convertData(data: ImportTransactionDTO[]): StatementDTO | null;
 }
 
-export abstract class XLSXParser<T, K> extends Parser<XLSX.WorkBook, T, K> {
+export abstract class XLSXParser<T, K> extends Parser<T, K> {
   protected parseData(buffer: ArrayBuffer): T[] {
     const data = new Uint8Array(buffer);
 
@@ -44,6 +44,7 @@ export abstract class XLSXParser<T, K> extends Parser<XLSX.WorkBook, T, K> {
 
     return this.findData(workbook);
   }
+  protected abstract findData(workbook: WorkBook | null): T[];
 }
 
-export abstract class CSVParser<T, K> extends Parser<string, T, K> {}
+export abstract class CSVParser<T, K> extends Parser<T, K> {}

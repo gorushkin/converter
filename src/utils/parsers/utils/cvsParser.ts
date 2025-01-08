@@ -44,7 +44,7 @@ export const parseVCS = <T>(data: string, params: Params): T[] => {
 
   const [headersLine] = lines.slice(header, header + 1).map((item) => item.split(','));
 
-  const result = lines.slice(start, end ?? lines.length - 1).map((item) => {
+  const result = lines.slice(start, end ?? lines.length).map((item) => {
     const line = parseLine(item);
 
     return line.reduce<T>((acc, item, index) => {

@@ -4,16 +4,16 @@ import { Currency, ImportTransactionDTO } from 'src/shared/types';
 import { convertTbcBusinessToBaseDate } from 'src/utils/formatters';
 
 import { CSVParser } from './parser';
-import type { BogDetailsDTO, TBCBusinessTransactionDTO } from './types';
+import type { TBCBusinessTransactionDTO } from './types';
 import { getAmount, parseVCS } from './utils';
 
-export class TbcBusinessParser extends CSVParser<TBCBusinessTransactionDTO, BogDetailsDTO> {
+export class TbcBusinessParser extends CSVParser<TBCBusinessTransactionDTO, TBCBusinessTransactionDTO> {
   protected parseData(data: string): TBCBusinessTransactionDTO[] {
-    return parseVCS(data, { endLine: '\r\n', header: 1, start: 2 });
+    const parsedData = parseVCS<TBCBusinessTransactionDTO>(data, { endLine: '\r\n', header: 1, start: 2 });
+
+    this.updateBalance(parsedData);
+    return parsedData;
   }
-  protected findData = (_: string | null) => {
-    throw new Error('Method not implemented.');
-  };
 
   prepareData = (data: TBCBusinessTransactionDTO[]): ImportTransactionDTO[] => {
     const results = data.map((item) => {
@@ -63,21 +63,18 @@ export class TbcBusinessParser extends CSVParser<TBCBusinessTransactionDTO, BogD
     };
   };
 
-  protected getBalance = (rows: BogDetailsDTO): number => {
-    const data = Object.values(rows);
-
-    const row = data.find((item) => item.includes(this.baseCurrency));
-
-    return parseFloat(row ?? '');
-  };
-
-  protected updateBalance = (rows: BogDetailsDTO[]): void => {
+  protected updateBalance = (rows: TBCBusinessTransactionDTO[]): void => {
     if (!rows.length) {
       return;
     }
 
-    const startBalance = this.getBalance(rows[5]);
-    const endBalance = this.getBalance(rows[9]);
+    const firstRow = rows[0];
+    const lastRow = rows.at(-1);
+
+    const amount = getAmount(firstRow['Paid Out'], firstRow['Paid In']);
+
+    const startBalance = Number(firstRow.Balance) - amount;
+    const endBalance = Number(lastRow?.Balance);
 
     this.balance = {
       endBalance,
