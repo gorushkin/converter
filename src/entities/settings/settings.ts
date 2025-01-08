@@ -1,12 +1,15 @@
 import { makeAutoObservable } from 'mobx';
 import { Bank, Currency } from 'src/shared/types';
-import { Parser, VakifParser, bogBusinessParser, bogRetailParser } from 'src/utils/parsers';
+import { VakifParser, BogBusinessParser, BogRetailParser, TbcBusinessParser } from 'src/utils/parsers';
 import { settingStorage } from 'src/utils/storage';
 
-const parserMapper: Record<Bank, typeof VakifParser | typeof bogRetailParser | typeof bogBusinessParser> = {
-  [Bank.BOGBusiness]: bogBusinessParser,
-  [Bank.BOGRetail]: bogRetailParser,
-  [Bank.TBC]: VakifParser,
+const parserMapper: Record<
+  Bank,
+  typeof VakifParser | typeof BogBusinessParser | typeof BogRetailParser | typeof TbcBusinessParser
+> = {
+  [Bank.BOGBusiness]: BogBusinessParser,
+  [Bank.BOGRetail]: BogRetailParser,
+  [Bank.TBCBusiness]: TbcBusinessParser,
   [Bank.VAKIF]: VakifParser,
 };
 
@@ -16,6 +19,8 @@ class Settings {
   private storage = settingStorage;
   private bank: Bank;
   private baseCurrency: Currency;
+
+  private fileFormat: 'xlsx' | 'csv' = 'csv';
 
   constructor(public isOpen = false) {
     this.bank = this.storage.getBank();
@@ -38,7 +43,15 @@ class Settings {
     this.isOpen = !this.isOpen;
   };
 
-  get parser(): Parser<unknown, unknown> {
+  get isCSV() {
+    return this.fileFormat === 'csv';
+  }
+
+  get isXLSX() {
+    return this.fileFormat === 'xlsx';
+  }
+
+  get parser(): VakifParser | BogBusinessParser | BogRetailParser | TbcBusinessParser {
     return new parserMapper[this.bank](this.bank, this.baseCurrency, Currency.RUB);
   }
 }

@@ -72,6 +72,33 @@ export type BOGBusinessTransactionDTO = {
   Balance: string;
 };
 
+export type TBCBusinessTransactionDTO = {
+  Date: string;
+  Description: string;
+  'Additional Information': string;
+  'Paid Out': string;
+  'Paid In': string;
+  Balance: string;
+  Type: string;
+  'Document Date': string;
+  'Document Number': string;
+  "Partner's Account": string;
+  "Partner's Name": string;
+  "Partner's Tax Code": string;
+  "Partner's Bank Code": string;
+  "Partner's Bank": string;
+  'Intermediary Bank Code': string;
+  'Intermediary Bank': string;
+  'Charge Details': string;
+  'Taxpayer Code': string;
+  'Taxpayer Name': string;
+  'Treasury Code': string;
+  'Op. Code': string;
+  'Additional Description': string;
+  'Transaction ID': string;
+  undefined: string;
+};
+
 export type BOGBusinessDetails = [
   {
     __EMPTY: string;

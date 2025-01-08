@@ -1,13 +1,14 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
 import { Currency, ImportTransactionDTO } from 'src/shared/types';
-import { convertBogBusinessToBaseDate, parseNumber } from 'src/utils/formatters';
+import { convertBogBusinessToBaseDate } from 'src/utils/formatters';
 import * as XLSX from 'xlsx';
 
-import { Parser } from './parser';
+import { XLSXParser } from './parser';
 import type { BOGBusinessDetails, BOGBusinessTransactionDTO, BogDetailsDTO } from './types';
+import { getAmount } from './utils';
 
-export class bogBusinessParser extends Parser<BOGBusinessTransactionDTO, BogDetailsDTO> {
+export class BogBusinessParser extends XLSXParser<BOGBusinessTransactionDTO, BogDetailsDTO> {
   rawData: ArrayBuffer | null = null;
   workbook: XLSX.WorkBook | null = null;
   private transactionSheetName = 'Statement of Account';
@@ -36,18 +37,6 @@ export class bogBusinessParser extends Parser<BOGBusinessTransactionDTO, BogDeta
 
   prepareData = (data: BOGBusinessTransactionDTO[]): ImportTransactionDTO[] => {
     return data.map((item) => {
-      const getAmount = (debit?: string, credit?: string) => {
-        if (debit) {
-          return -parseNumber(debit);
-        }
-
-        if (credit) {
-          return parseNumber(credit);
-        }
-
-        return 0;
-      };
-
       const amount = getAmount(item.Debit, item[' Credit']);
       const date = convertBogBusinessToBaseDate(item.Date);
 
