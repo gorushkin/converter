@@ -38,11 +38,13 @@ export enum Bank {
   BOGBusiness = 'BOGBusiness',
   TBCBusiness = 'TBCBusiness',
   VAKIF = 'VAKIF',
+  DEEL = 'DEEL',
 }
 
 const bankNameMap = {
   [Bank.BOGBusiness]: 'BOG Business',
   [Bank.BOGRetail]: 'BOG Retail',
+  [Bank.DEEL]: 'Deel',
   [Bank.TBCBusiness]: 'TBC Business',
   [Bank.VAKIF]: 'Vakif',
 };
