@@ -37,8 +37,8 @@ const parseLine = (line: string): string[] => {
   return result;
 };
 
-export const parseVCS = <T>(data: string, params: Params): T[] => {
-  const { end, endLine = '\n', header = 0, start = 0 } = params;
+export const parseVCS = <T>(data: string, params: Params = {}): T[] => {
+  const { end, endLine = '\n', header = 0, start = 1 } = params;
 
   const lines = data.trim().split(endLine);
 

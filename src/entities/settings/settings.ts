@@ -1,14 +1,15 @@
 import { makeAutoObservable } from 'mobx';
 import { Bank, Currency } from 'src/shared/types';
-import { VakifParser, BogBusinessParser, BogRetailParser, TbcBusinessParser } from 'src/utils/parsers';
+import { BogBusinessParser, VakifParser, BogRetailParser, TbcBusinessParser, DeelParser } from 'src/utils/parsers';
 import { settingStorage } from 'src/utils/storage';
 
 const parserMapper: Record<
   Bank,
-  typeof VakifParser | typeof BogBusinessParser | typeof BogRetailParser | typeof TbcBusinessParser
+  typeof VakifParser | typeof BogBusinessParser | typeof BogRetailParser | typeof TbcBusinessParser | typeof DeelParser
 > = {
   [Bank.BOGBusiness]: BogBusinessParser,
   [Bank.BOGRetail]: BogRetailParser,
+  [Bank.DEEL]: DeelParser,
   [Bank.TBCBusiness]: TbcBusinessParser,
   [Bank.VAKIF]: VakifParser,
 };
@@ -51,7 +52,7 @@ class Settings {
     return this.fileFormat === 'xlsx';
   }
 
-  get parser(): VakifParser | BogBusinessParser | BogRetailParser | TbcBusinessParser {
+  get parser(): VakifParser | BogBusinessParser | BogRetailParser | TbcBusinessParser | DeelParser {
     return new parserMapper[this.bank](this.bank, this.baseCurrency, Currency.RUB);
   }
 }

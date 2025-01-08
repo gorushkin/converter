@@ -1,32 +1,32 @@
 import type { RowDTO } from 'src/entities/row';
 import type { StatementDTO } from 'src/entities/statement';
 import { Currency, ImportTransactionDTO } from 'src/shared/types';
-import { convertTbcBusinessToBaseDate } from 'src/utils/formatters';
+import { convertDeelToBaseDate } from 'src/utils/formatters';
 
 import { CSVParser } from './parser';
-import type { TBCBusinessTransactionDTO } from './types';
+import type { DeelTransactionDTO } from './types';
 import { getAmount, parseVCS } from './utils';
 
-export class TbcBusinessParser extends CSVParser<TBCBusinessTransactionDTO, TBCBusinessTransactionDTO> {
-  protected parseData(data: string): TBCBusinessTransactionDTO[] {
-    const parsedData = parseVCS<TBCBusinessTransactionDTO>(data, { endLine: '\r\n', header: 1, start: 2 });
+export class DeelParser extends CSVParser<DeelTransactionDTO, DeelTransactionDTO> {
+  protected parseData(data: string): DeelTransactionDTO[] {
+    const parsedData = parseVCS<DeelTransactionDTO>(data);
 
     this.updateBalance(parsedData);
     return parsedData;
   }
 
-  prepareData = (data: TBCBusinessTransactionDTO[]): ImportTransactionDTO[] => {
+  prepareData = (data: DeelTransactionDTO[]): ImportTransactionDTO[] => {
     const results = data.map((item) => {
-      const amount = getAmount(item['Paid In'], item['Paid Out']);
-      const date = convertTbcBusinessToBaseDate(item.Date);
+      const amount = getAmount(item['Transaction Amount']);
+      const date = convertDeelToBaseDate(item['Date Requested']);
 
-      const memo = `${item.Description} ${item['Additional Information']}`;
-      const payee = item["Partner's Name"];
+      const memo = '';
+      const payee = item['Withdraw Method Custom Name'];
 
       return { amount, date, memo, payee };
     });
 
-    return results;
+    return results.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   };
 
   convertData = (data: ImportTransactionDTO[]): StatementDTO | null => {
@@ -63,18 +63,13 @@ export class TbcBusinessParser extends CSVParser<TBCBusinessTransactionDTO, TBCB
     };
   };
 
-  protected updateBalance = (rows: TBCBusinessTransactionDTO[]): void => {
+  protected updateBalance = (rows: DeelTransactionDTO[]): void => {
     if (!rows.length) {
       return;
     }
 
-    const firstRow = rows[0];
-    const lastRow = rows.at(-1);
-
-    const amount = getAmount(firstRow['Paid Out'], firstRow['Paid In']);
-
-    const startBalance = Number(firstRow.Balance) - amount;
-    const endBalance = Number(lastRow?.Balance);
+    const startBalance = 0;
+    const endBalance = 0;
 
     this.balance = {
       endBalance,

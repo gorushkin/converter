@@ -109,3 +109,24 @@ export type BOGBusinessDetails = [
     __EMPTY_1: number;
   },
 ];
+
+export type DeelTransactionDTO = {
+  ID: string;
+  'Date Requested': string;
+  'Transaction Status': string;
+  'Transaction Type': string;
+  Currency: string;
+  'Transaction Amount': string;
+  'Provider Fee': string;
+  'Amount Transferred': string;
+  'Currency Transferred': string;
+  Client: string;
+  'Contract Name': string;
+  'Contract URL': string;
+  'Invoice URL': string;
+  'Withdraw Method': string;
+  'Withdraw Method Custom Name': string;
+  'Withdraw Account Holder Name': string;
+  'Trace ID': string;
+  'Trace ID Type': string;
+};

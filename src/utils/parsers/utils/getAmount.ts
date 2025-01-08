@@ -1,12 +1,12 @@
 import { parseNumber } from 'src/utils/formatters';
 
 export const getAmount = (inflow?: string, outflow?: string) => {
-  if (inflow) {
-    return -parseNumber(inflow);
+  if (outflow) {
+    return -parseNumber(outflow);
   }
 
-  if (outflow) {
-    return parseNumber(outflow);
+  if (inflow) {
+    return parseNumber(inflow);
   }
 
   return 0;

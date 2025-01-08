@@ -37,7 +37,7 @@ export class BogBusinessParser extends XLSXParser<BOGBusinessTransactionDTO, Bog
 
   prepareData = (data: BOGBusinessTransactionDTO[]): ImportTransactionDTO[] => {
     return data.map((item) => {
-      const amount = getAmount(item.Debit, item[' Credit']);
+      const amount = getAmount(item[' Credit'], item.Debit);
       const date = convertBogBusinessToBaseDate(item.Date);
 
       const memo = item['Entry Comment'];

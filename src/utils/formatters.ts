@@ -8,6 +8,7 @@ const BOG_RETAIL_DATE_FORMAT = 'DD/MM/YYYY';
 const TBC_BUSINESS_DATE_FORMAT = 'DD/MM/YYYY';
 const BOG_BUSINESS_DATE_FORMAT = 'M/D/YY';
 const VAKIF_DATE_FORMAT = 'DD.MM.YYYY HH:mm';
+const DEEL_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 export const getCurrentDate = (): string => dayjs().format(BASE_DATE_FORMAT);
 
@@ -32,6 +33,7 @@ export const convertBogRetailToBaseDate = formatDate(BOG_RETAIL_DATE_FORMAT)(BAS
 export const convertBogBusinessToBaseDate = formatDate(BOG_BUSINESS_DATE_FORMAT)(BASE_DATE_FORMAT);
 export const convertTbcBusinessToBaseDate = formatDate(TBC_BUSINESS_DATE_FORMAT)(BASE_DATE_FORMAT);
 export const convertVakifToBaseDate = formatDate(VAKIF_DATE_FORMAT)(BASE_DATE_FORMAT);
+export const convertDeelToBaseDate = formatDate(DEEL_DATE_FORMAT)(BASE_DATE_FORMAT);
 
 export const getISODate = (date?: string) => dayjs(date).toISOString();
 

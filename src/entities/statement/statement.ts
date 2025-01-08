@@ -123,7 +123,7 @@ export class Statement {
   }
 
   get data() {
-    return [this.currentRow, ...this.rows];
+    return this.rows;
   }
 
   setBaseCurrency = (currency: Currency) => {
