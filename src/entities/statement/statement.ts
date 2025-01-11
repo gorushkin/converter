@@ -71,9 +71,12 @@ export class Statement {
     return this.currentRow.isValid;
   }
 
-  private addNewRow = () => {
-    const values = this.currentRow.values;
-    this.currentRow = new Row(this.rateUpdater, { date: values.date, exchangeRate: values.exchangeRate });
+  createRow = () => {
+    const newRow = new Row(this.rateUpdater);
+    newRow.id = getId();
+    newRow.open();
+
+    this.rows = [newRow, ...this.rows];
   };
 
   get isSaved() {
@@ -92,19 +95,6 @@ export class Statement {
       row.setValues(values);
       row.close();
     });
-  };
-
-  createRow = () => {
-    if (!this.currentRow.isValid) {
-      console.error('Row is not valid');
-      return;
-    }
-
-    this.currentRow.id = getId();
-    this.rows = [this.currentRow, ...this.rows];
-    const result = this.currentRow.amountInTargetCurrency.value;
-    this.addNewRow();
-    return result;
   };
 
   get statement(): StatementDTO {
@@ -190,13 +180,22 @@ export class Statement {
     return { endBalance: this.endBalance, startBalance: this.startBalance };
   }
 
-  updateRate = async () => {
+  getRowById = (id: string) => {
+    return this.rows.find((row) => row.id === id);
+  };
+
+  updateRowRate = async (id: string) => {
+    const row = this.getRowById(id);
+
+    if (!row) {
+      return;
+    }
     const rate = await this.rateUpdater(this.currentRow.date.value);
 
     if (!rate) return;
 
     runInAction(() => {
-      this.currentRow.exchangeRate.setValue(rate);
+      row.exchangeRate.setValue(rate);
     });
   };
 

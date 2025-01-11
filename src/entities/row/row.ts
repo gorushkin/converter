@@ -62,7 +62,7 @@ export class Row {
     );
 
     reaction(
-      () => this.date.value,
+      () => [this.date.value, this.amountInBaseCurrency.value],
       () => {
         if (!this.date.isValid) return;
 

@@ -55,7 +55,9 @@ export const columns: ColumnsType<TableRow> = [
   {
     dataIndex: 'exchangeRate',
     key: 'exchangeRate',
-    render: (cell: Cell<number>) => <RateInput cell={cell} />,
+    render: (cell: Cell<number>, row) => {
+      return <RateInput cell={cell} id={row.id} />;
+    },
     title: 'Rate',
   },
   {
