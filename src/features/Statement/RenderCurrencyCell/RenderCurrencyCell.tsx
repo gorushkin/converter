@@ -1,14 +1,13 @@
 import { observer } from 'mobx-react-lite';
-import { Cell } from 'src/entities/row';
 import { RenderCell } from 'src/shared/ui/Cell';
 import { numberToCopyCurrency, numberToUICurrency } from 'src/utils';
 
-type RenderCurrencyCellProps<T> = {
-  cell: Cell<T>;
+type RenderCurrencyCellProps = {
+  value: string;
 };
 
-export const RenderCurrencyCell = observer(<T,>({ cell }: RenderCurrencyCellProps<T>) => {
-  const formattedNumber = numberToUICurrency(Number(cell.value));
+export const RenderCurrencyCell = observer(({ value }: RenderCurrencyCellProps) => {
+  const formattedNumber = numberToUICurrency(Number(value));
 
-  return <RenderCell value={formattedNumber} toCopyValue={numberToCopyCurrency(cell.value)} />;
+  return <RenderCell value={formattedNumber} toCopyValue={numberToCopyCurrency(value)} />;
 });

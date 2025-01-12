@@ -74,6 +74,10 @@ export class Row {
   setValues = (values: Partial<RowDTO> = {}) => {
     runInAction(() => {
       this.date.setValue(values.date ?? getCurrentDate());
+
+      if (!values.date) {
+        void this.updateRate();
+      }
       this.inflow.setValue(values.inflow ?? 0);
       this.outflow.setValue(values.outflow ?? 0);
 

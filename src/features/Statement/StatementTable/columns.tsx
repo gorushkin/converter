@@ -19,54 +19,86 @@ export const columns: ColumnsType<TableRow> = [
   {
     dataIndex: 'date',
     key: 'date',
-    render: (cell: Cell<string>, row) => <CellWrapper cell={cell} closed={RenderTextCell} open={DateInput} row={row} />,
+    render: (_, row) => (
+      <CellWrapper
+        fieldname="date"
+        renderClosed={(props) => <RenderTextCell {...props} />}
+        renderEditable={(props) => <DateInput {...props} />}
+        row={row}
+      />
+    ),
     title: 'Date',
   },
   {
     dataIndex: 'outflow',
     key: 'outflow',
-    render: (cell: Cell<number>, row) => (
-      <CellWrapper cell={cell} closed={RenderCurrencyCell} open={AmountInput} row={row} />
+    render: (_, row) => (
+      <CellWrapper
+        fieldname="outflow"
+        renderClosed={(props) => <RenderCurrencyCell {...props} />}
+        renderEditable={(props) => <AmountInput {...props} />}
+        row={row}
+      />
     ),
     title: 'Outflow',
   },
   {
     dataIndex: 'inflow',
     key: 'inflow',
-    render: (cell: Cell<number>, row) => (
-      <CellWrapper cell={cell} closed={RenderCurrencyCell} open={AmountInput} row={row} />
+    render: (_, row) => (
+      <CellWrapper
+        fieldname="inflow"
+        renderClosed={(props) => <RenderCurrencyCell {...props} />}
+        renderEditable={(props) => <AmountInput {...props} />}
+        row={row}
+      />
     ),
     title: 'Inflow',
   },
   {
     dataIndex: 'amountInBaseCurrency',
     key: 'amountInBaseCurrency',
-    render: (cell: Cell<string>) => <RenderTextCell cell={cell} />,
+    render: (cell: Cell<string>) => <RenderTextCell value={cell.value} />,
     title: 'amount',
   },
   {
     dataIndex: 'memo',
     key: 'memo',
-    render: (cell: Cell<string>, row) => (
-      <CellWrapper cell={cell} closed={RenderTextCell} open={AmountInput} row={row} />
+    render: (_, row) => (
+      <CellWrapper
+        fieldname="memo"
+        renderClosed={(props) => <RenderTextCell {...props} />}
+        renderEditable={(props) => <AmountInput {...props} />}
+        row={row}
+      />
     ),
     title: 'Memo',
   },
   {
     dataIndex: 'exchangeRate',
     key: 'exchangeRate',
-    render: (cell: Cell<number>, row) => {
-      return <RateInput cell={cell} id={row.id} />;
-    },
+    render: (_, row) => (
+      <CellWrapper
+        fieldname="exchangeRate"
+        renderClosed={(props) => <RenderCurrencyCell {...props} />}
+        renderEditable={(props) => <RateInput {...props} />}
+        row={row}
+      />
+    ),
     title: 'Rate',
   },
   {
     dataIndex: 'amountInTargetCurrency',
     key: 'amountInTargetCurrency',
-    render: (cell: Cell<number>) => <RenderCurrencyCell cell={cell} />,
+    render: (_, row) => (
+      <CellWrapper
+        fieldname="amountInTargetCurrency"
+        renderClosed={(props) => <RenderCurrencyCell {...props} />}
+        row={row}
+      />
+    ),
     title: 'Target amount',
   },
-
   {
     dataIndex: 'action',
     key: 'action',

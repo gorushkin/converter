@@ -8,7 +8,7 @@ import type { RateUpdater, StatementDTO } from './types';
 
 export class Statement {
   rows: Row[] = [];
-  currentRow: Row;
+  currentRow: Row | null = null;
   baseCurrency: Currency = Currency.USD;
   targetCurrency: Currency = Currency.RUB;
   private apiClient = new ApiClient();
@@ -21,8 +21,6 @@ export class Statement {
   outflow = 0;
 
   constructor(statement?: StatementDTO) {
-    this.currentRow = new Row(this.rateUpdater);
-
     void this.load(statement);
 
     makeAutoObservable(this);
@@ -68,34 +66,38 @@ export class Statement {
   };
 
   get isCurrentRowValid() {
+    if (!this.currentRow) {
+      return false;
+    }
+
     return this.currentRow.isValid;
   }
 
   createRow = () => {
-    const newRow = new Row(this.rateUpdater);
-    newRow.id = getId();
+    const newRow = new Row(this.rateUpdater, { id: getId() });
     newRow.open();
 
-    this.rows = [newRow, ...this.rows];
+    runInAction(() => {
+      this.currentRow = newRow;
+      this.rows = [newRow, ...this.rows];
+    });
+  };
+
+  saveRow = () => {
+    if (!this.currentRow) {
+      return;
+    }
+
+    this.currentRow?.close();
+    const newRow = this.currentRow;
+    const rowIndex = this.rows.findIndex((row) => row.id === newRow.id);
+    this.rows[rowIndex] = newRow;
+    this.currentRow = null;
   };
 
   get isSaved() {
     return !!this.id;
   }
-
-  updateRow = (id: string, values: Partial<RowDTO>) => {
-    const row = this.rows.find((row) => row.id === id);
-
-    if (!row) {
-      console.error('Row not found');
-      return;
-    }
-
-    runInAction(() => {
-      row.setValues(values);
-      row.close();
-    });
-  };
 
   get statement(): StatementDTO {
     return {
@@ -130,7 +132,7 @@ export class Statement {
 
   reset = () => {
     this.rows = [];
-    this.currentRow = new Row(this.rateUpdater);
+    this.currentRow = null;
     this.name = '';
   };
 
@@ -165,11 +167,12 @@ export class Statement {
   };
 
   removeRow = (id: string) => {
-    if (id === this.currentRow.id) {
-      this.currentRow.reset();
-    } else {
-      this.rows = this.rows.filter((row) => row.id !== id);
-    }
+    throw new Error('Not implemented');
+    // if (id === this.currentRow.id) {
+    //   this.currentRow.reset();
+    // } else {
+    //   this.rows = this.rows.filter((row) => row.id !== id);
+    // }
   };
 
   updateName = (name: string) => {
@@ -190,13 +193,15 @@ export class Statement {
     if (!row) {
       return;
     }
-    const rate = await this.rateUpdater(this.currentRow.date.value);
 
-    if (!rate) return;
+    throw new Error('Not implemented');
+    // const rate = await this.rateUpdater(this.currentRow.date.value);
 
-    runInAction(() => {
-      row.exchangeRate.setValue(rate);
-    });
+    // if (!rate) return;
+
+    // runInAction(() => {
+    //   row.exchangeRate.setValue(rate);
+    // });
   };
 
   updateRowsRates = async () => {

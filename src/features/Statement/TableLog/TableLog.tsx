@@ -11,10 +11,10 @@ export const TableLog = observer(() => {
   const { currentStatement } = statementsStore;
 
   const statementLog = currentStatement.statement;
-  const rowLog = currentStatement.currentRow.values;
+  const rowLog = currentStatement.currentRow?.values;
 
   const [showStatementLog, setShowStatementLog] = useState(false);
-  const [showRowLog, setShowRowLog] = useState(false);
+  const [showRowLog, setShowRowLog] = useState(true);
 
   const handleShowStatementLog = () => {
     setShowStatementLog((prev) => !prev);
@@ -36,11 +36,7 @@ export const TableLog = observer(() => {
             <LogInfo data={statementLog} />{' '}
           </div>
         )}
-        {showRowLog && (
-          <div className={styles.log}>
-            <LogInfo data={rowLog} />
-          </div>
-        )}
+        {showRowLog && <div className={styles.log}>{rowLog && <LogInfo data={rowLog} />}</div>}
       </div>
     </div>
   );

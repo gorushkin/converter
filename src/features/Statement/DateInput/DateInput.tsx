@@ -9,12 +9,10 @@ type DateInputProps = {
   cell: Cell<string>;
 };
 
-export const DateInput = observer(({ cell }: DateInputProps) => {
-  const { isValid, setValue } = cell;
+export const DateInput = observer((props: DateInputProps) => {
+  const { cell } = props;
 
-  const handleChange = (value: string) => {
-    setValue(value);
-  };
+  const { isValid, setValue } = cell;
 
   const input = useRef<InputRef | null>(null);
 
@@ -22,5 +20,5 @@ export const DateInput = observer(({ cell }: DateInputProps) => {
     input.current?.focus();
   }, [cell.data.id]);
 
-  return <Input inputRef={input} type="date" {...cell} name="date" onChange={handleChange} isValid={isValid} />;
+  return <Input inputRef={input} type="date" {...cell} name="date" onChange={setValue} isValid={isValid} />;
 });
