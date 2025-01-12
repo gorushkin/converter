@@ -2,3 +2,31 @@
   display: flex;
   column-gap: 6px;
 }
+
+.clearButton {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.clear {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  position: relative;
+
+  &.checked {
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+  }
+}

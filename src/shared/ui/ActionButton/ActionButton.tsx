@@ -22,10 +22,6 @@ type ActionButtonProps = DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButton
 export const ActionButton = (props: ActionButtonProps) => {
   const { children, variant, ...rest } = props;
 
-  if (props.disabled) {
-    return null;
-  }
-
   const color = mapping[variant ?? 'primary'];
 
   return (

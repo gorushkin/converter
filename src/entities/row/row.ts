@@ -18,6 +18,7 @@ export class Row {
   payee = new Cell('');
   amountInTargetCurrency = new Cell(0);
   mode: 'edit' | 'view' = 'view';
+  isClear = false;
 
   updater: RateUpdater;
 
@@ -91,6 +92,7 @@ export class Row {
       this.payee.setValue(values.payee ?? '');
       this.id = values.id ?? '';
       this.runningBalance.setValue(values.runningBalance ?? 0);
+      this.isClear = values.isClear ?? false;
 
       if (values.id) {
         this.mode = 'view';
@@ -129,6 +131,7 @@ export class Row {
       exchangeRate: this.exchangeRate.value,
       id: this.id,
       inflow: this.inflow.value,
+      isClear: this.isClear,
       memo: this.memo.value,
       outflow: this.outflow.value,
       payee: this.payee.value,
@@ -172,5 +175,17 @@ export class Row {
       this.exchangeRate.setValue(values.exchangeRate);
       this.runningBalance.setValue(values.runningBalance);
     });
+  };
+
+  clear = () => {
+    this.isClear = true;
+  };
+
+  unClear = () => {
+    this.isClear = false;
+  };
+
+  toggleClear = () => {
+    this.isClear = !this.isClear;
   };
 }

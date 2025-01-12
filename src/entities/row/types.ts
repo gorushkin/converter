@@ -9,4 +9,5 @@ export type RowDTO = {
   amountInBaseCurrency: string;
   amountInTargetCurrency: string;
   runningBalance: string;
+  isClear: boolean;
 };
