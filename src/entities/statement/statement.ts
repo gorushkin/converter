@@ -77,9 +77,9 @@ export class Statement {
     return this.currentRow.isValid;
   }
 
-  createRow = () => {
+  addRow = () => {
     const newRow = new Row(this.rateUpdater, { id: getId() });
-    newRow.open();
+    this.mode.setEditMode(newRow.id);
 
     runInAction(() => {
       this.currentRow = newRow;
@@ -92,11 +92,13 @@ export class Statement {
       return;
     }
 
-    this.currentRow?.close();
-    const newRow = this.currentRow;
-    const rowIndex = this.rows.findIndex((row) => row.id === newRow.id);
-    this.rows[rowIndex] = newRow;
-    this.currentRow = null;
+    const newRow = new Row(this.rateUpdater, this.currentRow.values);
+
+    runInAction(() => {
+      this.rows = this.rows.map((row) => (row.id === newRow.id ? newRow : row));
+      this.mode.setViewMode();
+      this.currentRow = null;
+    });
   };
 
   get isSaved() {

@@ -11,7 +11,12 @@ export const StatementTable = observer(() => {
   const { data } = currentStatement;
 
   return (
-    <form className={styles.wrapper}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+      className={styles.wrapper}
+    >
       <Table rowKey={'id'} dataSource={data} columns={columns} pagination={false} />
     </form>
   );

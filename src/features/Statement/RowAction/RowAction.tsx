@@ -10,7 +10,7 @@ type RowActionProps = {
   row: Row;
 };
 export const RowAction = observer(({ row }: RowActionProps) => {
-  const { removeRow, saveRow } = statementsStore.currentStatement;
+  const { mode, removeRow, saveRow } = statementsStore.currentStatement;
 
   const handleRemoveClick = () => {
     removeRow(row.id);
@@ -20,18 +20,22 @@ export const RowAction = observer(({ row }: RowActionProps) => {
     statementsStore.currentStatement.setCurrentRow(row.id);
   };
 
-  const isSavingEnabled = row.isOpen;
-
   const isEditingEnabled = !row.isOpen;
+
+  const isRowInEditMode = mode.isEditable(row.id);
 
   return (
     <div className={styles.wrapper}>
-      <ActionButton variant="primary" disabled={!isEditingEnabled} onClick={onRowEditClick}>
-        edit
-      </ActionButton>
-      <ActionButton variant="success" type="submit" disabled={!isSavingEnabled} onClick={saveRow}>
-        save
-      </ActionButton>
+      {!isRowInEditMode && (
+        <ActionButton variant="primary" disabled={!isEditingEnabled} onClick={onRowEditClick}>
+          edit
+        </ActionButton>
+      )}
+      {isRowInEditMode && (
+        <ActionButton variant="success" type="submit" onClick={saveRow}>
+          save
+        </ActionButton>
+      )}
       <ActionButton variant="alert" onClick={handleRemoveClick}>
         delete
       </ActionButton>

@@ -12,7 +12,7 @@ import styles from './Actions.module.scss';
 
 export const Actions = observer(() => {
   const { currentStatement, updateStatement } = statementsStore;
-  const { createRow, isSaved, reset, sort, statement } = currentStatement;
+  const { addRow, isSaved, reset, sort, statement } = currentStatement;
 
   const saveModal = useModal();
   const loadModal = useModal();
@@ -27,7 +27,7 @@ export const Actions = observer(() => {
 
   return (
     <div className={styles.wrapper}>
-      <Button onClick={createRow} danger color="danger" type="primary">
+      <Button onClick={addRow} danger color="danger" type="primary">
         Add row
       </Button>
       <Button onClick={sort} type="primary">

@@ -36,6 +36,7 @@ export class ModeManager {
 
   setViewMode = () => {
     this.mode = 'view';
+    this.id = '';
   };
 
   isEditable = (id: string) => {
