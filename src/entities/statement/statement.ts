@@ -3,8 +3,11 @@ import { ApiClient } from 'src/api';
 import { Row, type RowDTO } from 'src/entities/row';
 import { columns, Currency, type Balance } from 'src/shared/types';
 import { getId } from 'src/utils/getId';
+import { ModeManager } from 'src/utils/ModeManager';
 
 import type { RateUpdater, StatementDTO } from './types';
+
+const modeManager = new ModeManager();
 
 export class Statement {
   rows: Row[] = [];
@@ -19,6 +22,7 @@ export class Statement {
   endBalance = 0;
   inflow = 0;
   outflow = 0;
+  mode = modeManager;
 
   constructor(statement?: StatementDTO) {
     void this.load(statement);
@@ -230,5 +234,17 @@ export class Statement {
     });
 
     return await Promise.all(promises);
+  };
+
+  setCurrentRow = (id: string) => {
+    const row = this.getRowById(id);
+
+    if (!row) {
+      return;
+    }
+
+    this.currentRow = new Row(this.rateUpdater, row.values);
+    this.currentRow.open();
+    this.mode.setEditMode(row.id);
   };
 }

@@ -13,14 +13,16 @@ export const CellWrapper = observer(<T,>(props: CellWrapperProps<T>) => {
   const { fieldname, renderClosed, renderEditable, row } = props;
 
   const { currentStatement } = statementsStore;
-  const { currentRow } = currentStatement;
+  const { currentRow, mode } = currentStatement;
 
   const editableCell = currentRow?.[fieldname] as Cell<T>;
 
   const cell = row[fieldname] as Cell<T>;
   const cellValue = cell.value;
 
-  if (row.isOpen && renderEditable) {
+  const isRowEditable = mode.isEditable(row.id) && renderEditable;
+
+  if (isRowEditable) {
     return renderEditable({ cell: editableCell });
   }
 

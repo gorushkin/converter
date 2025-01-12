@@ -17,8 +17,7 @@ export const RowAction = observer(({ row }: RowActionProps) => {
   };
 
   const onRowEditClick = () => {
-    console.log('onRowEditClick');
-    // statementsStore.currentStatement.setCurrentRow(row.id);
+    statementsStore.currentStatement.setCurrentRow(row.id);
   };
 
   const isSavingEnabled = row.isOpen;
