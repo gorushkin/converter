@@ -39,7 +39,7 @@ export class ModeManager {
     this.id = '';
   };
 
-  isEditable = (id: string) => {
+  isRowInEditMode = (id: string) => {
     return this.mode === 'edit' && this.id === id;
   };
 }

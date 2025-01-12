@@ -173,12 +173,8 @@ export class Statement {
   };
 
   removeRow = (id: string) => {
-    throw new Error('Not implemented');
-    // if (id === this.currentRow.id) {
-    //   this.currentRow.reset();
-    // } else {
-    //   this.rows = this.rows.filter((row) => row.id !== id);
-    // }
+    this.currentRow = null;
+    this.rows = this.rows.filter((row) => row.id !== id);
   };
 
   updateName = (name: string) => {

@@ -20,9 +20,9 @@ export const CellWrapper = observer(<T,>(props: CellWrapperProps<T>) => {
   const cell = row[fieldname] as Cell<T>;
   const cellValue = cell.value;
 
-  const isRowEditable = mode.isEditable(row.id) && renderEditable;
+  const isRowInEditMode = mode.isRowInEditMode(row.id) && renderEditable;
 
-  if (isRowEditable) {
+  if (isRowInEditMode) {
     return renderEditable({ cell: editableCell });
   }
 

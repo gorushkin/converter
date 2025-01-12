@@ -16,13 +16,14 @@ type ModalProps = {
   onCancel?: () => void;
   isOpen?: boolean;
   okButtonText?: string;
+  danger?: boolean;
   cancelButtonText?: string;
   onClose?: () => void;
   modal?: ModalType;
 };
 
 export const Modal = (props: ModalProps) => {
-  const { cancelButtonText, children, isOpen, modal, okButtonText, onCancel, onOk, title } = props;
+  const { cancelButtonText, children, danger, isOpen, modal, okButtonText, onCancel, onOk, title } = props;
 
   const isModalOpen = modal ? modal.isOpen : isOpen;
   const closeModal = modal ? modal.close : onCancel;
@@ -49,7 +50,7 @@ export const Modal = (props: ModalProps) => {
             {!!onOk && (
               <>
                 {okButtonText && (
-                  <Button onClick={handleOkClick} type="primary">
+                  <Button onClick={handleOkClick} danger={danger} type="primary">
                     {okButtonText}
                   </Button>
                 )}
