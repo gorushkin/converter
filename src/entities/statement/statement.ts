@@ -9,6 +9,8 @@ import type { RateUpdater, StatementDTO } from './types';
 
 const modeManager = new ModeManager();
 
+const NEW_ROW_ID = 'new-row';
+
 export class Statement {
   rows: Row[] = [];
   currentRow: Row | null = null;
@@ -78,13 +80,34 @@ export class Statement {
   }
 
   addRow = () => {
-    const newRow = new Row(this.rateUpdater, { id: getId() });
+    const newRow = new Row(this.rateUpdater, { id: NEW_ROW_ID });
     this.mode.setEditMode(newRow.id);
 
     runInAction(() => {
       this.currentRow = newRow;
-      this.rows = [newRow, ...this.rows];
     });
+  };
+
+  getRowPosition = (date: string) => {
+    for (let i = 0; i < this.rows.length; i++) {
+      const item = this.rows[i];
+      if (date >= item.date.value) {
+        return i;
+      }
+    }
+
+    return this.rows.length;
+  };
+
+  insertNewRow = (row: Row) => {
+    const position = this.getRowPosition(row.date.value);
+
+    const rowsWithoutNew = this.rows;
+
+    const left = rowsWithoutNew.slice(0, position);
+    const right = rowsWithoutNew.slice(position);
+
+    this.rows = [...left, row, ...right];
   };
 
   saveRow = () => {
@@ -94,8 +117,16 @@ export class Statement {
 
     const newRow = new Row(this.rateUpdater, this.currentRow.values);
 
+    if (this.currentRow.id === NEW_ROW_ID) {
+      newRow.id = getId();
+    }
+
     runInAction(() => {
-      this.rows = this.rows.map((row) => (row.id === newRow.id ? newRow : row));
+      if (this.currentRow?.id === NEW_ROW_ID) {
+        this.insertNewRow(newRow);
+      } else {
+        this.rows = this.rows.map((row) => (row.id === newRow.id ? newRow : row));
+      }
       this.mode.setViewMode();
       this.currentRow = null;
     });
@@ -121,6 +152,9 @@ export class Statement {
   }
 
   get data() {
+    if (this.currentRow) {
+      return [this.currentRow, ...this.rows];
+    }
     return this.rows;
   }
 
